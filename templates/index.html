@@ -2,111 +2,173 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>AI in Healthcare | Welcome</title>
+    <title>Virtual Health Assistant | AI in Healthcare</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <header>
-      <h1>AI in Healthcare</h1>
-      <p>Your intelligent health assistant</p>
+      <h1>AI-Powered Virtual Health Assistant</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/ask">Ask AI</a>
+        <a href="/visualize">3D Anatomy</a>
+        <a href="/metrics">Health Metrics</a>
+      </nav>
     </header>
     <main>
       <section>
-        <h2>Health Assistant</h2>
-        <select id="task-type">
-          <option value="symptom_check">Symptom Checker</option>
-          <option value="report">Medical Report</option>
-        </select>
+        <h2>Ask a Health Question</h2>
         <textarea
-          id="symptom-input"
-          placeholder="Enter symptoms or report details..."
+          id="prompt"
+          placeholder="E.g., What are symptoms of hypertension?"
         ></textarea>
-        <button onclick="submitQuery()">Analyze</button>
-        <p id="response">Enter input to get started.</p>
+        <button onclick="submitPrompt()">Ask AI</button>
+        <div id="response"></div>
       </section>
       <section>
-        <h2>3D Anatomy Explorer</h2>
-        <div id="anatomy-viewer" style="height: 400px"></div>
+        <h2>Upload Medical Document</h2>
+        <input type="file" id="document" accept=".pdf" />
+        <button onclick="uploadDocument()">Upload PDF</button>
+      </section>
+      <section>
+        <h2>Explore Anatomy</h2>
+        <canvas id="3d-canvas"></canvas>
+      </section>
+      <section>
+        <h2>Track Health Metrics</h2>
+        <input
+          type="number"
+          id="heart-rate"
+          placeholder="Enter heart rate (bpm)"
+        />
+        <button onclick="addMetric()">Add Metric</button>
+        <canvas id="metrics-chart" width="400" height="200"></canvas>
       </section>
     </main>
     <script>
-      async function submitQuery() {
-        const input = document.getElementById("symptom-input").value;
-        const taskType = document.getElementById("task-type").value;
-        const response = await fetch("/api/ask", {
+      // Fetch greeting
+      fetch("/api/hello")
+        .then((r) => r.json())
+        .then((d) => (document.getElementById("response").textContent = d.msg));
+
+      //Submitting Promt
+      function submitPrompt() {
+        const prompt = document.getElementById("prompt").value;
+
+        fetch("/api/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: input, task_type: taskType }),
-        });
-        const data = await response.json();
-        document.getElementById("response").textContent =
-          data.reply || "Error: No response";
-        // Dynamic model loading
-        const modelPath =
-          input.includes("chest") || input.includes("heart")
-            ? "/static/assets/3d/heart.glb"
-            : "/static/assets/3d/lungs.glb";
-        loader.load(
-          modelPath,
-          (gltf) => {
-            scene.clear();
-            scene.add(gltf.scene);
-          },
-          undefined,
-          (error) => console.error(error)
-        );
-      }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/examples/js/controls/OrbitControls.js"></script>
-    <script>
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / 400,
-        0.1,
-        1000
-      );
-      const renderer = new THREE.WebGLRenderer({
-        canvas: document.getElementById("anatomy-viewer"),
-      });
-      renderer.setSize(window.innerWidth, 400);
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      const loader = new THREE.GLTFLoader();
-      loader.load(
-        "/static/assets/3d/heart.glb",
-        (gltf) => {
-          gltf.scene.userData = { prompt: "Explain heart conditions" };
-          scene.add(gltf.scene);
-          renderer.domElement.addEventListener("click", async () => {
-            const response = await fetch("/api/ask", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                prompt: gltf.scene.userData.prompt,
-                task_type: "report",
-              }),
-            });
-            const data = await response.json();
-            document.getElementById("response").textContent = data.reply;
+          body: JSON.stringify({ prompt }),
+        })
+          .then((response) => {
+            if (!response.body) {
+              throw new Error("ReadableStream not supported in this browser.");
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let responseText = "";
+
+            function read() {
+              return reader.read().then(({ done, value }) => {
+                if (done) {
+                  console.log("Stream complete");
+                  return;
+                }
+
+                // Decode chunk and process SSE data: strip 'data: ' prefix and newlines
+                const chunk = decoder.decode(value, { stream: true });
+                // SSE messages are sent as: data: <chunk>\n\n
+                const lines = chunk
+                  .split("\n")
+                  .filter((line) => line.startsWith("data: "));
+                lines.forEach((line) => {
+                  const data = line.replace(/^data: /, "");
+                  responseText += data;
+                  // Update your UI live here
+                  document.getElementById("response").textContent =
+                    responseText;
+                });
+
+                return read();
+              });
+            }
+
+            return read();
+          })
+          .catch((error) => {
+            console.error("Error in fetch stream:", error);
           });
-        },
-        undefined,
-        (error) => console.error(error)
-      );
+      }
+
+      // Upload document
+      function uploadDocument() {
+        const fileInput = document.getElementById("document");
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((r) => r.json())
+          .then((d) => alert(d.msg));
+      }
+
+      // 3D visualization
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, 400 / 300, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("3d-canvas"),
+      });
+      renderer.setSize(400, 300);
+      const loader = new THREE.GLTFLoader();
+      loader.load("/static/assets/3d/heart.gltf", (gltf) => {
+        scene.add(gltf.scene);
+      });
       camera.position.z = 5;
-      const animate = () => {
+      function animate() {
         requestAnimationFrame(animate);
-        controls.update();
         renderer.render(scene, camera);
-      };
+      }
       animate();
+
+      // Chart.js for health metrics
+      let metrics = [];
+      let chart;
+      function addMetric() {
+        const heartRate = document.getElementById("heart-rate").value;
+        if (!heartRate || isNaN(heartRate)) return;
+        metrics.push(Number(heartRate));
+        const ctx = document.getElementById("metrics-chart").getContext("2d");
+        if (chart) chart.destroy(); // Destroy previous chart to avoid overlap
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: metrics.map((_, i) => `Reading ${i + 1}`),
+            datasets: [
+              {
+                label: "Heart Rate (bpm)",
+                data: metrics,
+                borderColor: "#007bff",
+                backgroundColor: "rgba(0, 123, 255, 0.1)",
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: "BPM" } },
+              x: { title: { display: true, text: "Measurement" } },
+            },
+          },
+        });
+      }
     </script>
   </body>
 </html>
