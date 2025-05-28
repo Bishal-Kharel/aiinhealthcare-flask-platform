@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI in Healthcare | Welcome</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header>
+      <h1>AI in Healthcare</h1>
+      <p>Your intelligent health assistant</p>
+    </header>
+    <main>
+      <section>
+        <h2>Health Assistant</h2>
+        <select id="task-type">
+          <option value="symptom_check">Symptom Checker</option>
+          <option value="report">Medical Report</option>
+        </select>
+        <textarea
+          id="symptom-input"
+          placeholder="Enter symptoms or report details..."
+        ></textarea>
+        <button onclick="submitQuery()">Analyze</button>
+        <p id="response">Enter input to get started.</p>
+      </section>
+      <section>
+        <h2>3D Anatomy Explorer</h2>
+        <div id="anatomy-viewer" style="height: 400px"></div>
+      </section>
+    </main>
+    <script>
+      async function submitQuery() {
+        const input = document.getElementById("symptom-input").value;
+        const taskType = document.getElementById("task-type").value;
+        const response = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: input, task_type: taskType }),
+        });
+        const data = await response.json();
+        document.getElementById("response").textContent =
+          data.reply || "Error: No response";
+        // Dynamic model loading
+        const modelPath =
+          input.includes("chest") || input.includes("heart")
+            ? "/static/assets/3d/heart.glb"
+            : "/static/assets/3d/lungs.glb";
+        loader.load(
+          modelPath,
+          (gltf) => {
+            scene.clear();
+            scene.add(gltf.scene);
+          },
+          undefined,
+          (error) => console.error(error)
+        );
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/examples/js/controls/OrbitControls.js"></script>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / 400,
+        0.1,
+        1000
+      );
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("anatomy-viewer"),
+      });
+      renderer.setSize(window.innerWidth, 400);
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        "/static/assets/3d/heart.glb",
+        (gltf) => {
+          gltf.scene.userData = { prompt: "Explain heart conditions" };
+          scene.add(gltf.scene);
+          renderer.domElement.addEventListener("click", async () => {
+            const response = await fetch("/api/ask", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                prompt: gltf.scene.userData.prompt,
+                task_type: "report",
+              }),
+            });
+            const data = await response.json();
+            document.getElementById("response").textContent = data.reply;
+          });
+        },
+        undefined,
+        (error) => console.error(error)
+      );
+      camera.position.z = 5;
+      const animate = () => {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      };
+      animate();
+    </script>
+  </body>
+</html>
