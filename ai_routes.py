@@ -1,80 +1,52 @@
-from flask import Blueprint, request, jsonify
-import requests
-import sqlite3
-import logging
+from flask import Blueprint, request, jsonify,stream_with_context, Response
+from langchain_ollama import OllamaLLM
+import redis
+import hashlib
+import os
 
+
+# Create a Flask blueprint for AI-related routes
 ai_bp = Blueprint("ai", __name__)
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Initialize the LLM model
+llm = OllamaLLM(model="llama3:8b")
 
-def select_model(prompt, task_type):
-    """Select model based on task type or prompt length."""
-    if task_type == "symptom_check" or len(prompt) < 100:
-        return "mistral"  # Lightweight for quick responses
-    return "llama3:8b"  # Better for complex reasoning
+# Redis connection using environment variables with fallback defaults
+redis_client = redis.Redis(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=int(os.getenv("REDIS_PORT", 6380)),
+    db=int(os.getenv("REDIS_DB", 0)),
+    decode_responses=True
+)
+
+def hash_prompt(prompt):
+    """Create a consistent hash key for a given prompt"""
+    return hashlib.sha256(prompt.encode('utf-8')).hexdigest()
 
 @ai_bp.route("/api/ask", methods=["POST"])
 def ask():
     data = request.get_json()
-    prompt = data.get("prompt", "")
-    task_type = data.get("task_type", "symptom_check")
+    prompt = data.get("prompt")
+    if not prompt:
+        return jsonify({"error": "No prompt provided"}), 400
 
-    # Check cache
-    conn = sqlite3.connect("cache.db")
-    cursor = conn.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS cache (prompt TEXT PRIMARY KEY, response TEXT)")
-    cursor.execute("SELECT response FROM cache WHERE prompt=?", (prompt,))
-    cached = cursor.fetchone()
+    cache_key = f"llm_response:{hash_prompt(prompt)}"
 
-    if cached:
-        conn.close()
-        logging.info(f"Cache hit for prompt: {prompt}")
-        return jsonify({"reply": cached[0]})
+    # Check cache first
+    cached_response = redis_client.get(cache_key)
+    if cached_response:
+        return jsonify({"response": cached_response, "cached": True})
 
-    # Select model
-    model = select_model(prompt, task_type)
-    logging.info(f"Using model: {model} for prompt: {prompt}")
+    # Streamed response for uncached prompts
+    def generate():
+        full_response = ""
+        for chunk in llm.stream(prompt):
+            full_response += chunk
+            yield f"data: {chunk}\n\n"
+        redis_client.setex(cache_key, 3600, full_response)
 
-    # Craft healthcare-specific prompt
-    if task_type == "symptom_check":
-        full_prompt = (
-            f"You are a healthcare assistant. Analyze these symptoms: {prompt}. "
-            f"Suggest possible conditions and actions in bullet points, max 100 words. "
-            f"Avoid definitive diagnoses; always recommend consulting a doctor."
-        )
-    else:  # Medical report
-        full_prompt = (
-            f"You are a medical report generator. Based on input: {prompt}, "
-            f"generate a detailed summary with sections for Observations, Analysis, and Recommendations."
-        )
+    # Used SSE-compatible stream response
+    return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
-    # Call Ollama
-    try:
-        response = requests.post(
-            OLLAMA_API_URL,
-            json={
-                "model": model,
-                "prompt": full_prompt,
-                "stream": False,
-                "options": {
-                    "num_ctx": 2048,  # Context length suitable for M1 Max
-                    "temperature": 0.7  # Balanced creativity
-                }
-            },
-            timeout=30
-        )
-        response.raise_for_status()
-        reply = response.json().get("response", "Error: No response from model")
-    except Exception as e:
-        logging.error(f"Ollama error: {str(e)}")
-        reply = f"Error: {str(e)}"
 
-    # Cache result
-    cursor.execute("INSERT INTO cache (prompt, response) VALUES (?, ?)", (prompt, reply))
-    conn.commit()
-    conn.close()
-
-    return jsonify({"reply": reply, "model_used": model})
