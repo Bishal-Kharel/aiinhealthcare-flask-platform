@@ -2,20 +2,71 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 20px;
-  background-color: #f4f4f9;
+  background: #f4f4f4;
 }
+
 header {
-  text-align: center;
-  padding: 20px;
-  background-color: #007bff;
+  background: #8fbc8f;
   color: white;
+  padding: 15px;
+  text-align: center;
 }
+
+nav a {
+  color: white;
+  margin: 0 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
 main {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
 }
-#greeting {
-  font-size: 1.2em;
-  color: #333;
+
+section {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+textarea,
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background: #8fbc8f;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+#3d-canvas {
+  width: 400px;
+  height: 300px;
+  border: 1px solid #ccc;
+}
+
+#metrics-chart {
+  max-width: 400px;
+}
+
+#response,
+#search-results {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f9f9f9;
 }
