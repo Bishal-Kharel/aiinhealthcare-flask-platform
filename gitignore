@@ -14,3 +14,7 @@ venv/
 # IDE files
 .vscode/
 .idea/
+
+
+#chroma Vector database
+chroma_store/
