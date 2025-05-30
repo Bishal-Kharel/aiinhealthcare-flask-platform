@@ -50,10 +50,13 @@ def ask():
     docs = vectorstore.similarity_search(prompt, k=3)  # top 3 docs
 
     # 2. Combine docs text into context string
-    context = "\n\n---\n\n".join([doc.page_content for doc in docs])
+    context = "\n\n---\n\n".join([doc.page_content for doc in docs if doc.page_content.strip()])
 
     # 3. Construct full prompt for LLM
-    full_prompt = f"Use the following context to answer the question:\n\n{context}\n\nQuestion: {prompt}\nAnswer:"
+    if context:
+        full_prompt = f"Use the following medical context to answer the question:\n\n{context}\n\nQuestion: {prompt}\nAnswer:"
+    else:
+        full_prompt = prompt  # fallback: let LLM handle it freely
 
     # Streamed response for uncached prompts
     def generate():
