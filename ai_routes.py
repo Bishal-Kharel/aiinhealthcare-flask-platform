@@ -29,7 +29,7 @@ redis_client = redis.Redis(
 BODY_PARTS = [
     "whole body anatomy", "human anatomy full body",
     "heart", "lungs", "skeleton", "muscle",
-    "brain", "kidney", "liver","skull"
+    "brain", "kidney", "liver","skull","body"
 ]
 
 def hash_prompt(prompt):
