@@ -6,7 +6,15 @@
     <title>Chat</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='chat.css') }}"
+      href="{{ url_for('static', filename='css/threeDModel.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chatMessages.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chatInput.css') }}"
     />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
@@ -133,6 +141,8 @@
         </div>
       </div>
     </main>
-    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatMessages.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatInput.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/threeDModel.js') }}"></script>
   </body>
 </html>
