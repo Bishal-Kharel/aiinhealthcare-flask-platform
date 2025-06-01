@@ -116,7 +116,10 @@ if __name__ == "__main__":
         "human brain anatomy",
         "human kidney anatomy",
         "human liver anatomy",
-        "human Muscles and Bones Anatomy body Animation"
+        "human Muscles and Bones Anatomy body Animation",
+        "anatomy"
+        "body"
+        "human"
     ]
 
     fetch_models_for_queries(queries, limit_per_query=5)
