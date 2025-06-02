@@ -1,107 +1,131 @@
+// static/js/threeDModelFull.js
+
 document.addEventListener("DOMContentLoaded", () => {
-  const modelContainer = document.getElementById("model-container");
-  loadFullBodyModel("/static/assets/3d/myology/scene.gltf", modelContainer);
-});
+  const container = document.getElementById("model-container");
+  if (!container) {
+    console.error("Model container not found");
+    return;
+  }
 
-let bodyParts = {};
-let currentHighlight = null;
-
-function loadFullBodyModel(modelPath, container) {
+  // Scene setup
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0);
+
   const camera = new THREE.PerspectiveCamera(
     45,
-    container.clientWidth / container.clientHeight,
+    container.clientWidth / container.clientHeight || 1,
     0.1,
     1000
   );
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.innerHTML = "";
+  camera.position.set(0, 1.5, 5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Set initial renderer size
+  const setRendererSize = () => {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (width > 0 && height > 0) {
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    } else {
+      setTimeout(setRendererSize, 100);
+    }
+  };
+  setRendererSize();
   container.appendChild(renderer.domElement);
 
-  const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-  scene.add(light);
+  // Add lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-  controls.rotateSpeed = 0.5;
-  controls.enableZoom = true;
-  controls.enablePan = false;
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(0, 5, 5);
+  scene.add(directionalLight);
 
+  // Load model
   const loader = new THREE.GLTFLoader();
   loader.load(
-    modelPath,
+    "/static/assets/3d/ecorche_-_anatomy_study/scene.gltf",
     (gltf) => {
-      scene.add(gltf.scene);
-      // Traverse to find body parts
-      gltf.scene.traverse((child) => {
-        if (child.isMesh && child.name) {
-          const lowerName = child.name.toLowerCase();
-          if (
-            ["brain", "heart", "liver", "kidney", "muscle"].includes(lowerName)
-          ) {
-            bodyParts[lowerName] = child;
-            // Save original material
-            child.userData.originalMaterial = child.material;
-          }
+      const model = gltf.scene;
+
+      model.traverse((child) => {
+        if (child.isMesh) {
+          console.log("Mesh name:", child.name);
+        } else if (child.isGroup) {
+          console.log("Group name:", child.name);
         }
       });
 
-      // Adjust camera
-      const box = new THREE.Box3().setFromObject(gltf.scene);
-      const center = box.getCenter(new THREE.Vector3());
+      // Compute bounding box to normalize model size
+      const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = 6 / maxDim;
-      gltf.scene.scale.set(scale, scale, scale);
-      gltf.scene.position.sub(center.multiplyScalar(scale));
+      model.scale.set(scale, scale, scale);
 
+      // Center model horizontally, position legs at bottom of container
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.set(-center.x * scale, 0, -center.z * scale); // Center x and z
+      model.position.y = -box.min.y * scale - size.y * scale * 0.2; // Shift down
+
+      scene.add(model);
+
+      // Adjust camera to frame the model
       const fov = camera.fov * (Math.PI / 180);
-      let distance = maxDim / (2 * Math.tan(fov / 2));
-      if (window.innerWidth < 480) {
-        distance *= 1.5; // Adjust for smaller screens
-      }
-      camera.position.set(0, 0, distance * 1.2);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
+      const distance = (maxDim * scale) / Math.tan(fov / 2);
+      camera.position.z = distance * 0.55;
+      camera.position.y = size.y * scale * 0.3; // Lower camera to follow model
+      camera.lookAt(0, size.y * scale * 0.3, 0); // Look at new model center
+
+      // Update orbit controls target
+      controls.target.set(0, size.y * scale * 0.3, 0);
       controls.update();
 
-      const animate = function () {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      };
-      animate();
+      // Force render after model loads
+      setRendererSize();
+      renderer.render(scene, camera);
     },
     undefined,
     (error) => {
-      console.error("Error loading 3D model:", error);
-      const errorMsg = document.createElement("div");
-      errorMsg.className = "error-message";
-      errorMsg.textContent = "Failed to load 3D model.";
-      container.appendChild(errorMsg);
+      console.error("An error occurred while loading the model:", error);
     }
   );
-}
 
-window.highlightPart = function (partName) {
-  if (currentHighlight) {
-    resetHighlight(currentHighlight);
-  }
-  const part = bodyParts[partName.toLowerCase()];
-  if (part) {
-    currentHighlight = partName;
-    part.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  }
-};
+  // Controls
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.target.set(0, 0, 0);
+  controls.update();
 
-window.resetHighlight = function () {
-  if (currentHighlight) {
-    const part = bodyParts[currentHighlight.toLowerCase()];
-    if (part && part.userData.originalMaterial) {
-      part.material = part.userData.originalMaterial;
+  // Resize handler
+  const onResize = () => {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (width > 0 && height > 0) {
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+      renderer.render(scene, camera);
     }
-    currentHighlight = null;
+  };
+  window.addEventListener("resize", onResize);
+
+  // Monitor container size changes
+  const observer = new ResizeObserver(() => {
+    onResize();
+  });
+  observer.observe(container);
+
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
   }
-};
+
+  animate();
+});
