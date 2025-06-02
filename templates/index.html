@@ -16,6 +16,10 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/chatInput.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/threeDModelFull.css') }}"
+    />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
@@ -144,5 +148,6 @@
     <script src="{{ url_for('static', filename='js/chatMessages.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chatInput.js') }}"></script>
     <script src="{{ url_for('static', filename='js/threeDModel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/threeDModelFull.js') }}"></script>
   </body>
 </html>
