@@ -29,7 +29,7 @@ redis_client = redis.Redis(
 BODY_PARTS = [
     "whole body anatomy", "human anatomy full body",
     "heart", "lungs", "skeleton", "muscle",
-    "brain", "kidney", "liver","skull","body"
+    "brain", "kidney", "liver","skull","body","ecorche_-_anatomy_study","fullBody"
 ]
 
 def hash_prompt(prompt):
@@ -76,9 +76,8 @@ def ask():
             # Send model path first (if any)
             if model_path:
                 yield f"data: {json.dumps({'model_path': model_path})}\n\n"
-            # Stream cached text response
-            for chunk in cached_response:
-                yield f"data: {json.dumps({'text': chunk})}\n\n"
+            # cached_response is a string, send it as one chunk with body_part
+            yield f"data: {json.dumps({'text': cached_response, 'body_part': body_part})}\n\n"
         return Response(stream_with_context(cached_stream()), mimetype="text/event-stream")
 
     # Embed and search for relevant docs
@@ -97,10 +96,11 @@ def ask():
         # Send model path first (if any)
         if model_path:
             yield f"data: {json.dumps({'model_path': model_path})}\n\n"
-        # Stream LLM response
+        # Stream LLM response chunk by chunk
         for chunk in llm.stream(full_prompt):
             full_response += chunk
-            yield f"data: {json.dumps({'text': chunk})}\n\n"
+            yield f"data: {json.dumps({'text': chunk, 'body_part': body_part})}\n\n"
+        # Cache full response as string
         redis_client.setex(cache_key, 3600, full_response)
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
