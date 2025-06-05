@@ -1,0 +1,19 @@
+#intro-video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* behind prompt */
+  overflow: hidden;
+  background: black;
+  display: block; /* make sure it's not display:none */
+}
+
+#intro-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center;
+  display: block; /* no display:none */
+}

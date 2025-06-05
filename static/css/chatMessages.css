@@ -40,8 +40,8 @@
 }
 
 .user-message {
-  background: #2a2a2a;
-  color: #ffffff;
+  background: #d9d9d9;
+  color: #1c1c1e;
   padding: 0.8rem;
   border-radius: 20px;
   margin: 0.75rem 4rem 0.5rem 0;
@@ -51,7 +51,7 @@
 
 .ai-message {
   background: transparent;
-  color: #ffffff;
+  color: #1c1c1e;
   padding: 0.8rem;
   border-radius: 12px;
   margin: 0.75rem 2rem 0.5rem 0;
@@ -61,7 +61,7 @@
 
 .three-viewer {
   width: 100%;
-  max-width: 70vw;
+  max-width: 40vw;
   aspect-ratio: 16 / 9;
   margin: 0.2rem auto 0.3rem auto;
   position: relative;
@@ -97,7 +97,6 @@
   #chat-messages,
   #expanded-chat-messages {
     padding: 0.5rem;
-    padding-bottom: 100px; /* Extra space for sticky prompt on small screens */
   }
 
   .user-message,
