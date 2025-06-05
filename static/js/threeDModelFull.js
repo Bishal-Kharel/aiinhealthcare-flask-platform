@@ -1,4 +1,14 @@
-// static/js/threeDModelFull.js
+const BODY_PART_MESHES = {
+  brain: "Object_5",
+  heart: "Object_3",
+  lungs: "Object_2",
+  muscle: "Object_0",
+  skeleton: "Object_1",
+  kidney: "Object_4",
+  liver: null,
+  skull: null,
+  body: null,
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("model-container");
@@ -9,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Scene setup
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf0f0f0);
+  scene.background = new THREE.Color(0xf2f2f7);
 
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -45,12 +55,43 @@ document.addEventListener("DOMContentLoaded", () => {
   directionalLight.position.set(0, 5, 5);
   scene.add(directionalLight);
 
+  // Store the model for later manipulation
+  let model = null;
+  let originalMaterials = new Map(); // Store original materials for restoring
+
+  // Function to highlight mesh based on body part
+  function highlightMesh(bodyPart) {
+    if (!model) return;
+    // Reset previous highlights
+    model.traverse((child) => {
+      if (child.isMesh && originalMaterials.has(child)) {
+        child.material = originalMaterials.get(child);
+      }
+    });
+    originalMaterials.clear();
+
+    if (bodyPart && BODY_PART_MESHES[bodyPart]) {
+      model.traverse((child) => {
+        if (child.isMesh && child.name === BODY_PART_MESHES[bodyPart]) {
+          originalMaterials.set(child, child.material); // Save original material
+          child.material = new THREE.MeshStandardMaterial({
+            color: 0xff0000, // Red highlight
+            metalness: 0.5,
+            roughness: 0.5,
+          });
+        }
+      });
+    } else if (bodyPart && !BODY_PART_MESHES[bodyPart]) {
+      console.log(`No specific mesh available for ${bodyPart}.`);
+    }
+  }
+
   // Load model
   const loader = new THREE.GLTFLoader();
   loader.load(
     "/static/assets/3d/ecorche_-_anatomy_study/scene.gltf",
     (gltf) => {
-      const model = gltf.scene;
+      model = gltf.scene;
 
       model.traverse((child) => {
         if (child.isMesh) {
@@ -84,6 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Update orbit controls target
       controls.target.set(0, size.y * scale * 0.3, 0);
       controls.update();
+
+      // Highlight based on initial body part
+      highlightMesh(window.currentBodyPart);
 
       // Force render after model loads
       setRendererSize();
@@ -119,6 +163,16 @@ document.addEventListener("DOMContentLoaded", () => {
     onResize();
   });
   observer.observe(container);
+
+  // Monitor body part changes
+  let lastBodyPart = null;
+  function checkBodyPart() {
+    if (window.currentBodyPart !== lastBodyPart) {
+      lastBodyPart = window.currentBodyPart;
+      highlightMesh(window.currentBodyPart);
+    }
+  }
+  setInterval(checkBodyPart, 500); // Check every 500ms
 
   // Animation loop
   function animate() {
