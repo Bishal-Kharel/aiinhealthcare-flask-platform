@@ -34,7 +34,7 @@ def fetch_models_for_queries(queries, limit_per_query=3):
         params = {
             "q": query,
             "downloadable": "true",
-            "license": "cc0",
+            "license": "cc0","cc"
             "sort_by": "-likeCount",
             "type": "models"
         }
