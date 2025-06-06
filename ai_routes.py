@@ -11,7 +11,7 @@ from langchain_chroma import Chroma
 ai_bp = Blueprint("ai", __name__)
 
 # Initialize the LLM model
-llm = OllamaLLM(model="llama3:8b")
+llm = OllamaLLM(model="llama3:8b", temperature=0.7)
 
 # Load persisted vectorstore
 embedding = OllamaEmbeddings(model="nomic-embed-text")
@@ -86,9 +86,22 @@ def ask():
 
     # Construct full prompt for LLM
     if context:
-        full_prompt = f"Use the following medical context to answer the question:\n\n{context}\n\nQuestion: {prompt}\nAnswer:"
+        full_prompt = (
+            f"You are a helpful and empathetic medical assistant. "
+            f"Using the context below, answer the question in a friendly, easy-to-understand, human tone. "
+            f"Be clear, concise, and compassionate.\n\n"
+            f"Context:\n{context}\n\n"
+            f"User's Question: {prompt}\n\n"
+            f"Your Answer:"
+        )
     else:
-        full_prompt = prompt
+        full_prompt = (
+            f"You are a helpful and empathetic medical assistant. "
+            f"Answer the following question in a friendly, easy-to-understand, human tone. "
+            f"Be clear, concise, and compassionate.\n\n"
+            f"User's Question: {prompt}\n\n"
+            f"Your Answer:"
+        )
 
     # Streamed response for uncached prompts
     def generate():
