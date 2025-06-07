@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from ai_routes import ai_bp
+import os
 from dotenv import load_dotenv
 
 load_dotenv()  # Load .env variables
