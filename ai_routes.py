@@ -1,20 +1,20 @@
 from flask import Blueprint, request, jsonify, stream_with_context, Response
-from langchain_ollama import OllamaLLM
 import redis
 import hashlib
 import os
 import json
-from langchain_ollama import OllamaEmbeddings
+from openai import OpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 
 # Create a Flask blueprint for AI-related routes
 ai_bp = Blueprint("ai", __name__)
 
-# Initialize the LLM model
-llm = OllamaLLM(model="llama3:8b", temperature=0.7)
+# Initialize the OpenAI client
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Load persisted vectorstore
-embedding = OllamaEmbeddings(model="nomic-embed-text")
+embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"), model="text-embedding-3-small")
 vectorstore = Chroma(persist_directory="chroma_store", embedding_function=embedding)
 
 # Redis connection
@@ -29,7 +29,7 @@ redis_client = redis.Redis(
 BODY_PARTS = [
     "whole body anatomy", "human anatomy full body",
     "heart", "lungs", "skeleton", "muscle",
-    "brain", "kidney", "liver","skull","body","ecorche_-_anatomy_study","fullBody"
+    "brain", "kidney", "liver", "skull", "body", "ecorche_-_anatomy_study", "fullBody"
 ]
 
 def hash_prompt(prompt):
@@ -109,10 +109,21 @@ def ask():
         # Send model path first (if any)
         if model_path:
             yield f"data: {json.dumps({'model_path': model_path})}\n\n"
-        # Stream LLM response chunk by chunk
-        for chunk in llm.stream(full_prompt):
-            full_response += chunk
-            yield f"data: {json.dumps({'text': chunk, 'body_part': body_part})}\n\n"
+        # Stream OpenAI response chunk by chunk
+        stream = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful and empathetic medical assistant."},
+                {"role": "user", "content": full_prompt}
+            ],
+            stream=True,
+            temperature=0.7
+        )
+        for chunk in stream:
+            if chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                full_response += content
+                yield f"data: {json.dumps({'text': content, 'body_part': body_part})}\n\n"
         # Cache full response as string
         redis_client.setex(cache_key, 3600, full_response)
 
