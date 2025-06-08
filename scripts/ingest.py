@@ -3,12 +3,12 @@ from langchain_community.document_loaders import (
     UnstructuredWordDocumentLoader, UnstructuredMarkdownLoader
 )
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain.docstore.document import Document
-
 import os
 import xml.etree.ElementTree as ET
+
 
 # Define the document path
 docs_path = "docs/"
@@ -72,10 +72,7 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100
 split_docs = text_splitter.split_documents(all_documents)
 
 # Embed and store in ChromaDB
-embedding = OllamaEmbeddings(model="nomic-embed-text")
+embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"), model="text-embedding-3-small")
 vectorstore = Chroma.from_documents(split_docs, embedding=embedding, persist_directory="chroma_store")
-
-# Persist the underlying Chroma client data to disk
-# vectorstore.persist()
 
 print("Documents ingested and stored.")
