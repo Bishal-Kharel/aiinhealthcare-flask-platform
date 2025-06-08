@@ -1,13 +1,10 @@
 const BODY_PART_MESHES = {
-  brain: "Object_5",
-  heart: "Object_3",
-  lungs: "Object_2",
-  muscle: "Object_0",
-  skeleton: "Object_1",
-  kidney: "Object_4",
-  liver: null,
-  skull: null,
-  body: null,
+  "hands and legs": "Object_11",
+  heart: "Object_7", // Mesh Object_3, node 7
+  innerbody: "Object_6", // Mesh Object_2, node 6
+  Dermis: "Object_4", // Mesh Object_0, node 4
+  skeleton: "Object_5", // Mesh Object_1, node 5 Not FInded
+  bones: "Object_9", // Mesh Object_4, node 9
 };
 
 document.addEventListener("DOMContentLoaded", () => {
