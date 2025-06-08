@@ -27,9 +27,9 @@ redis_client = redis.Redis(
 
 # List of body parts based on sketchfab_fetcher.py queries
 BODY_PARTS = [
-    "whole body anatomy", "human anatomy full body",
+    "bones", "innerbody",
     "heart", "lungs", "skeleton", "muscle",
-    "brain", "kidney", "liver", "skull", "body", "ecorche_-_anatomy_study", "fullBody"
+    "brain", "kidney", "liver", "skull", "body", "ecorche_-_anatomy_study", "fullBody","hands and legs","Dermis"
 ]
 
 def hash_prompt(prompt):
