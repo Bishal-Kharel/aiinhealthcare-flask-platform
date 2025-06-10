@@ -157,7 +157,6 @@ The **full-body 3D model**, powered by **Three.js** and loaded from `static/asse
 
 ```
 aiinhealthcare-flask-platform/
-├── .env.example
 ├── .gitignore
 ├── README.md
 ├── app.py
@@ -170,23 +169,17 @@ aiinhealthcare-flask-platform/
 │   │   ├── MedQuAD_1.xml
 │   │   ├── MedQuAD_2.xml
 │   │   └── ...
-│   ├── other_document_formats/
-│   │   ├── sample.pdf
-│   │   ├── sample.csv
-│   │   └── sample.md
-│   └── screenshots/
-│       ├── screenshot_initial_prompt.png
-│       └── screenshot_chat_with_3d_model.png
+│   └── other_document_formats/
+│       ├── sample.pdf
+│       ├── sample.csv
+│       └── sample.md
 ├── static/
 │   ├── assets/
 │   │   ├── 3d/
 │   │   │   ├── ecorche_-_anatomy_study/
 │   │   │   │   ├── scene.gltf
 │   │   │   │   └── textures/
-│   │   │   ├── heart/
-│   │   │   │   ├── scene.gltf
-│   │   │   │   └── textures/
-│   │   │   ├── liver/
+│   │   │   ├── brain/
 │   │   │   │   ├── scene.gltf
 │   │   │   │   └── textures/
 │   │   │   └── ...
@@ -196,13 +189,15 @@ aiinhealthcare-flask-platform/
 │   │   ├── chatInput.css
 │   │   ├── chatMessages.css
 │   │   ├── introVideo.css
-│   │   ├── threeDModel.css
 │   │   └── threeDModelFull.css
-│   └── js/
-│       ├── chatInput.js
-│       ├── chatMessages.js
-│       ├── dynamic3dModel.js
-│       └── threeDModelFull.js
+│   ├── js/
+│   │   ├── chatInput.js
+│   │   ├── chatMessages.js
+│   │   ├── dynamic3dModel.js
+│   │   └── threeDModelFull.js
+│   └── screenshots/
+│       ├── screenshot1.png
+│       └── screenshot2.png
 ├── templates/
 │   └── index.html
 └── chroma_store/
