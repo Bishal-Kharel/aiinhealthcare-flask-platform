@@ -21,48 +21,68 @@ function load3DModel(modelPath, container) {
   controls.enableZoom = true;
   controls.enablePan = false;
 
-  const loader = new THREE.GLTFLoader();
-  loader.load(
-    modelPath,
-    (gltf) => {
-      const box = new THREE.Box3().setFromObject(gltf.scene);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const scale = 4 / maxDim;
-      gltf.scene.scale.set(scale, scale, scale);
-      gltf.scene.position.sub(center.multiplyScalar(scale));
+  function finalizeModel(modelObject) {
+    const box = new THREE.Box3().setFromObject(modelObject);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 4 / maxDim;
+    modelObject.scale.set(scale, scale, scale);
+    modelObject.position.sub(center.multiplyScalar(scale));
 
-      scene.add(gltf.scene);
+    scene.add(modelObject);
 
-      const fov = camera.fov * (Math.PI / 180);
-      const scaledMaxDim = maxDim * scale;
-      const distance = scaledMaxDim / (2 * Math.tan(fov / 2));
-      camera.position.set(0, 0, distance * 1.2);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
+    const fov = camera.fov * (Math.PI / 180);
+    const distance = (maxDim * scale) / (2 * Math.tan(fov / 2));
+    camera.position.set(0, 0, distance * 1.2);
+    camera.lookAt(0, 0, 0);
+    controls.target.set(0, 0, 0);
+    controls.update();
+
+    window.addEventListener("resize", () => {
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    const animate = function () {
+      requestAnimationFrame(animate);
       controls.update();
+      renderer.render(scene, camera);
+    };
+    animate();
+  }
 
-      window.addEventListener("resize", () => {
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-      });
-
-      const animate = function () {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      };
-      animate();
-    },
-    undefined,
-    (error) => {
-      console.error("Error loading 3D model:", error);
-      const errorMsg = document.createElement("div");
-      errorMsg.className = "error-message";
-      errorMsg.textContent = "Failed to load 3D model.";
-      container.appendChild(errorMsg);
-    }
-  );
+  if (modelPath) {
+    // ✅ Load from path if provided
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      modelPath,
+      (gltf) => {
+        finalizeModel(gltf.scene);
+      },
+      undefined,
+      (error) => {
+        console.error("Error loading 3D model:", error);
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "error-message";
+        errorMsg.textContent = "Failed to load 3D model.";
+        container.appendChild(errorMsg);
+      }
+    );
+  } else if (window.selectedBodyPartModel) {
+    // ✅ Use previously exported submodel if no modelPath
+    const subModel = Array.isArray(window.selectedBodyPartModel)
+      ? new THREE.Group().add(
+          ...window.selectedBodyPartModel.map((mesh) => mesh.clone())
+        )
+      : window.selectedBodyPartModel.clone();
+    finalizeModel(subModel);
+  } else {
+    // ❌ Nothing to show
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "error-message";
+    errorMsg.textContent = "No model available to display.";
+    container.appendChild(errorMsg);
+  }
 }

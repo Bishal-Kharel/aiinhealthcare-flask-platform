@@ -65,7 +65,11 @@ function submitPrompt(prompt, messagesId) {
               }
 
               if (parsed.body_part) {
-                window.currentBodyPart = parsed.body_part; // Export body_part globally
+                window.currentBodyPart = parsed.body_part; // Export body_part globally'
+                console.log(
+                  "Received body part from SSE:",
+                  window.currentBodyPart
+                );
               }
 
               if (parsed.model_path && window.is3DRenderActive) {

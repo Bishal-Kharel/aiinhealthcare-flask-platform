@@ -18,18 +18,23 @@ embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"), model="text-em
 vectorstore = Chroma(persist_directory="chroma_store", embedding_function=embedding)
 
 # Redis connection
-redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=int(os.getenv("REDIS_PORT", 6380)),
-    db=int(os.getenv("REDIS_DB", 0)),
-    decode_responses=True
-)
+redis_url = os.getenv("REDIS_URL")
+
+if redis_url:
+    redis_client = redis.from_url(redis_url, decode_responses=True)
+else:
+    redis_client = redis.Redis(
+        host=os.getenv("REDIS_HOST"),
+        port=int(os.getenv("REDIS_PORT")),
+        db=int(os.getenv("REDIS_DB", 0)),
+        decode_responses=True
+    )
 
 # List of body parts based on sketchfab_fetcher.py queries
 BODY_PARTS = [
     "bones", "innerbody",
     "heart", "lungs", "skeleton", "muscle",
-    "brain", "kidney", "liver", "skull", "body", "ecorche_-_anatomy_study", "fullBody","hands and legs","Dermis"
+    "brain", "kidney", "liver", "skull", "body", "ecorche_-_anatomy_study", "fullBody","hands and legs","Dermis", "skin","spinal_cord", "eye"
 ]
 
 def hash_prompt(prompt):

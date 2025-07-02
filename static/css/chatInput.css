@@ -1,3 +1,9 @@
+.logo {
+  height: clamp(25px, 4vw, 40px);
+  width: auto;
+  transition: height 0.3s ease;
+  margin: 1rem;
+}
 #chat-board {
   width: 60%;
   background: #f2f2f7;
@@ -158,7 +164,6 @@
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  /* background: #f2f2f7; */
 }
 
 #initial-chat-input-wrapper {

@@ -1,11 +1,4 @@
-const BODY_PART_MESHES = {
-  "hands and legs": "Object_11",
-  heart: "Object_7", // Mesh Object_3, node 7
-  innerbody: "Object_6", // Mesh Object_2, node 6
-  Dermis: "Object_4", // Mesh Object_0, node 4
-  skeleton: "Object_5", // Mesh Object_1, node 5 Not FInded
-  bones: "Object_9", // Mesh Object_4, node 9
-};
+import BODY_PART_MESHES from "./bodyPartMeshes.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("model-container");
@@ -29,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // Set initial renderer size
   const setRendererSize = () => {
     const width = container.clientWidth;
     const height = container.clientHeight;
@@ -52,13 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
   directionalLight.position.set(0, 5, 5);
   scene.add(directionalLight);
 
-  // Store the model for later manipulation
   let model = null;
-  let originalMaterials = new Map(); // Store original materials for restoring
+  let originalMaterials = new Map();
 
-  // Function to highlight mesh based on body part
+  // ✅ Updated highlightMesh function
   function highlightMesh(bodyPart) {
     if (!model) return;
+
     // Reset previous highlights
     model.traverse((child) => {
       if (child.isMesh && originalMaterials.has(child)) {
@@ -67,18 +59,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     originalMaterials.clear();
 
-    if (bodyPart && BODY_PART_MESHES[bodyPart]) {
+    const targetMeshes = BODY_PART_MESHES[bodyPart];
+    if (bodyPart && targetMeshes) {
       model.traverse((child) => {
-        if (child.isMesh && child.name === BODY_PART_MESHES[bodyPart]) {
-          originalMaterials.set(child, child.material); // Save original material
+        if (
+          child.isMesh &&
+          Array.isArray(targetMeshes) &&
+          targetMeshes.includes(child.name)
+        ) {
+          originalMaterials.set(child, child.material);
           child.material = new THREE.MeshStandardMaterial({
-            color: 0xff0000, // Red highlight
+            color: 0xff0000,
             metalness: 0.5,
             roughness: 0.5,
           });
         }
       });
-    } else if (bodyPart && !BODY_PART_MESHES[bodyPart]) {
+    } else {
       console.log(`No specific mesh available for ${bodyPart}.`);
     }
   }
@@ -86,47 +83,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load model
   const loader = new THREE.GLTFLoader();
   loader.load(
-    "/static/assets/3d/ecorche_-_anatomy_study/scene.gltf",
+    "/static/assets/3d/3d-vh-m-united.glb",
     (gltf) => {
       model = gltf.scene;
-
-      model.traverse((child) => {
-        if (child.isMesh) {
-          console.log("Mesh name:", child.name);
-        } else if (child.isGroup) {
-          console.log("Group name:", child.name);
-        }
-      });
-
-      // Compute bounding box to normalize model size
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = 6 / maxDim;
       model.scale.set(scale, scale, scale);
 
-      // Center model horizontally, position legs at bottom of container
       const center = box.getCenter(new THREE.Vector3());
-      model.position.set(-center.x * scale, 0, -center.z * scale); // Center x and z
-      model.position.y = -box.min.y * scale - size.y * scale * 0.2; // Shift down
+      model.position.set(-center.x * scale, 0, -center.z * scale);
+      model.position.y = -box.min.y * scale - size.y * scale * 0.2;
 
       scene.add(model);
 
-      // Adjust camera to frame the model
       const fov = camera.fov * (Math.PI / 180);
       const distance = (maxDim * scale) / Math.tan(fov / 2);
       camera.position.z = distance * 0.55;
-      camera.position.y = size.y * scale * 0.3; // Lower camera to follow model
-      camera.lookAt(0, size.y * scale * 0.3, 0); // Look at new model center
+      camera.position.y = size.y * scale * 0.3;
+      camera.lookAt(0, size.y * scale * 0.3, 0);
 
-      // Update orbit controls target
       controls.target.set(0, size.y * scale * 0.3, 0);
       controls.update();
 
-      // Highlight based on initial body part
       highlightMesh(window.currentBodyPart);
 
-      // Force render after model loads
       setRendererSize();
       renderer.render(scene, camera);
     },
@@ -142,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   controls.target.set(0, 0, 0);
   controls.update();
 
-  // Resize handler
+  // Resize handling
   const onResize = () => {
     const width = container.clientWidth;
     const height = container.clientHeight;
@@ -155,13 +137,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   window.addEventListener("resize", onResize);
 
-  // Monitor container size changes
   const observer = new ResizeObserver(() => {
     onResize();
   });
   observer.observe(container);
 
-  // Monitor body part changes
   let lastBodyPart = null;
   function checkBodyPart() {
     if (window.currentBodyPart !== lastBodyPart) {
@@ -169,9 +149,8 @@ document.addEventListener("DOMContentLoaded", () => {
       highlightMesh(window.currentBodyPart);
     }
   }
-  setInterval(checkBodyPart, 500); // Check every 500ms
+  setInterval(checkBodyPart, 500);
 
-  // Animation loop
   function animate() {
     requestAnimationFrame(animate);
     controls.update();
