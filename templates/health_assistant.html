@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ai Health Assistant</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/threeDModel.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chatMessages.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chatInput.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/threeDModelFull.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/introVideo.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/index.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+  </head>
+
+  <body style="opacity: 0; transition: opacity 0.5s ease">
+    <header id="main-header">
+      <div class="logo">
+        <img src="static/images/logo.png" alt="Virtual Health Assistant Logo" />
+      </div>
+    </header>
+    <div id="intro-video-container">
+      <video id="intro-video" autoplay muted playsinline>
+        <source
+          src="{{ url_for('static', filename='videos/intro1.mp4') }}"
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <main>
+      <div id="initial-prompt-container">
+        <div id="initial-chat-input-wrapper">
+          <div id="initial-input-row">
+            <input
+              type="text"
+              id="initial-chat-input"
+              placeholder="Ask about a body part..."
+              autocomplete="off"
+            />
+            <button id="initial-send-btn">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
+          <button id="initial-render-3d-btn" title="Toggle 3D Render">
+            3D Render
+          </button>
+        </div>
+      </div>
+      <div id="chat-interface" style="display: none">
+        <div id="model-container"></div>
+        <div id="chat-board">
+          <section id="chat-section">
+            <div id="answer-container">
+              <div id="chat-messages"></div>
+            </div>
+            <div id="prompt-container">
+              <div id="chat-input-wrapper">
+                <div id="input-row">
+                  <input
+                    type="text"
+                    id="chat-input"
+                    placeholder="Ask about a body part..."
+                    autocomplete="off"
+                  />
+                  <button id="send-btn">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <button id="render-3d-btn" title="Toggle 3D Render">
+                  3D Render
+                </button>
+              </div>
+            </div>
+          </section>
+          <section id="expanded-chat" style="display: none">
+            <div id="expanded-answer-container">
+              <button id="collapse-btn">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              <div id="expanded-chat-messages"></div>
+            </div>
+            <div id="expanded-prompt-container">
+              <div id="expanded-input-wrapper">
+                <div id="expanded-input-row">
+                  <input
+                    type="text"
+                    id="expanded-chat-input"
+                    placeholder="Ask about a body part..."
+                    autocomplete="off"
+                  />
+                  <button id="expanded-send-btn">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <button id="expanded-render-3d-btn" title="Toggle 3D Render">
+                  3D Render
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/chatMessages.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatInput.js') }}"></script>
+    <script
+      type="module"
+      src="{{ url_for('static', filename='js/threeDModelFull.js') }}"
+    ></script>
+    <script src="{{ url_for('static', filename='js/dynamic3dModel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+
+    <script>
+      window.addEventListener("load", () => {
+        document.body.style.opacity = "1";
+      });
+    </script>
+  </body>
+</html>
