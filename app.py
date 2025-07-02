@@ -12,6 +12,17 @@ app.register_blueprint(ai_bp)
 def index():
     return render_template("index.html", project_name="AI in Healthcare")
 
+@app.route("/health-assistant")
+def health_assistant():
+    return render_template("health_assistant.html", project_name="AI Health Assistant")
+@app.route('/policy')
+def policy():
+    return render_template('privacy_policy.html')
+
+@app.route('/aboutus')
+def about():
+    return render_template('about.html')
+
 @app.route("/api/hello", methods=["GET"])
 def hello():
     return jsonify({"msg": "Welcome to AI in Healthcare!"})
