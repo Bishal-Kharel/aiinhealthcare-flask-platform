@@ -91,9 +91,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   collapseBtn.onclick = () => {
+    // Hide all chat UIs
     expandedChat.style.display = "none";
-    document.getElementById("chat-section").style.display = "flex";
-    chatInput.focus();
-    syncMessages("expanded-chat-messages", "chat-messages");
+    document.getElementById("chat-section").style.display = "none";
+    chatInterface.style.display = "none";
+
+    // Show initial chat prompt again
+    initialPromptContainer.style.display = "flex";
+
+    // Clear inputs (optional)
+    initialChatInput.value = "";
+    chatInput.value = "";
+    expandedChatInput.value = "";
+
+    // Show logo again (optional, if hidden)
+    const logoContainer = document.getElementById("logo-container");
+    if (logoContainer) logoContainer.style.display = "flex";
+
+    // Focus back on the initial input
+    initialChatInput.focus();
   };
 });

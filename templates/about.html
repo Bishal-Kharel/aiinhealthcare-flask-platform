@@ -1,103 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About Us</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        margin: 40px;
-        background-color: #f9f9f9;
-        color: #333;
-      }
-      h1,
-      h2,
-      h3 {
-        color: #2c3e50;
-      }
-      .dataset-section {
-        margin-top: 40px;
-      }
-      .dataset {
-        margin-bottom: 30px;
-        padding: 15px;
-        background-color: #ffffff;
-        border-left: 4px solid #007bff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      }
-      a {
-        color: #007bff;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      footer {
-        margin-top: 50px;
-        font-size: 0.9em;
-        color: #888;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>About Doctors Online Shop</h1>
-    <p>This is the About page for Doctor Online Medical Services.</p>
+{% extends "base.html" %} {% block title %}About Us | Doctors Online{% endblock
+%} {% block extra_head %}
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  h1,
+  h2,
+  h3 {
+    color: #2c3e50;
+  }
+  .dataset-section {
+    margin-top: 40px;
+  }
+  .dataset {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  footer {
+    margin-top: 50px;
+    font-size: 0.9em;
+    color: #888;
+  }
+  .content-wrapper {
+    padding-top: 70px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+  }
+  @media (max-width: 768px) {
+    .content-wrapper {
+      max-width: 100%;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+  }
+  @media (max-width: 480px) {
+    .content-wrapper {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="content-wrapper">
+  <h1>About Doctors Online Shop</h1>
+  <p>This is the About page for Doctor Online Medical Services.</p>
 
-    <section class="dataset-section">
-      <h2>📚 Dataset & Model Sources</h2>
+  <section class="dataset-section">
+    <h2>📚 Dataset & Model Sources</h2>
 
-      <div class="dataset">
-        <h3>1. MedQuAD (Medical Question Answering Dataset)</h3>
-        <ul>
-          <li>
-            <strong>Source:</strong>
-            <a
-              href="https://www.nlm.nih.gov/databases/download/medquad.html"
-              target="_blank"
-              rel="noopener"
-              >MedQuAD - NIH</a
-            >
-          </li>
-          <li>
-            <strong>License:</strong> Public Domain (U.S. Government Work)
-          </li>
-          <li>
-            <strong>Description:</strong> Over 45,000 medical Q&A pairs from NIH
-            covering a wide range of health topics.
-          </li>
-          <li><strong>Format:</strong> XML (parsed into Q&A text)</li>
-          <li>
-            <strong>Usage:</strong> Used in a vector database for
-            retrieval-augmented generation (RAG) by our AI Health Assistant.
-          </li>
-        </ul>
-      </div>
+    <div class="dataset">
+      <h3>1. MedQuAD (Medical Question Answering Dataset)</h3>
+      <ul>
+        <li>
+          <strong>Source:</strong>
+          <a
+            href="https://www.nlm.nih.gov/databases/download/medquad.html"
+            target="_blank"
+            rel="noopener"
+            >MedQuAD - NIH</a
+          >
+        </li>
+        <li><strong>License:</strong> Public Domain (U.S. Government Work)</li>
+        <li>
+          <strong>Description:</strong> Over 45,000 medical Q&A pairs from NIH
+          covering a wide range of health topics.
+        </li>
+        <li><strong>Format:</strong> XML (parsed into Q&A text)</li>
+        <li>
+          <strong>Usage:</strong> Used in a vector database for
+          retrieval-augmented generation (RAG) by our AI Health Assistant.
+        </li>
+      </ul>
+    </div>
 
-      <div class="dataset">
-        <h3>2. 3D Medical Model</h3>
-        <ul>
-          <li>
-            <strong>Source:</strong>
-            <a
-              href="https://3d.nih.gov/entries/21626"
-              target="_blank"
-              rel="noopener"
-              >NIH 3D Model - Entry #21626</a
-            >
-          </li>
-          <li>
-            <strong>License:</strong> CC-BY (Creative Commons Attribution)
-          </li>
-          <li>
-            <strong>Description:</strong> Anatomically accurate model used for
-            enhanced visual engagement in the AI interface.
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <footer>&copy; 2025 EliteCare Medical Assistant</footer>
-  </body>
-</html>
+    <div class="dataset">
+      <h3>2. 3D Medical Model</h3>
+      <ul>
+        <li>
+          <strong>Source:</strong>
+          <a
+            href="https://3d.nih.gov/entries/21626"
+            target="_blank"
+            rel="noopener"
+            >NIH 3D Model - Entry #21626</a
+          >
+        </li>
+        <li><strong>License:</strong> CC-BY (Creative Commons Attribution)</li>
+        <li>
+          <strong>Description:</strong> Anatomically accurate model used for
+          enhanced visual engagement in the AI interface.
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+{% endblock %}
