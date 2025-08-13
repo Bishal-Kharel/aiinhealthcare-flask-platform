@@ -6,6 +6,45 @@
     <title>
       {% block title %}Doctors Online Medical Services{% endblock %}
     </title>
+
+    <!-- Basic SEO -->
+    <meta
+      name="description"
+      content="AI-powered healthcare assistant available 24/7. Get expert medical advice instantly."
+    />
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Doctors Online Shop" />
+    <meta
+      property="og:description"
+      content="AI-powered healthcare assistant available 24/7."
+    />
+    <meta
+      property="og:image"
+      content="https://www.doctorsonline.shop/static/images/tweet.png"
+    />
+    <meta property="og:url" content="https://www.doctorsonline.shop" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Card (Optional, for better Twitter previews) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Doctors Online Shop" />
+    <meta
+      name="twitter:description"
+      content="AI-powered healthcare assistant available 24/7."
+    />
+    <meta
+      name="twitter:image"
+      content="https://www.doctorsonline.shop/static/images/tweet.png"
+    />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='images/favicon.png') }}"
+    />
+
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/index.css') }}"
@@ -22,12 +61,17 @@
             alt="Virtual Health Assistant Logo"
           />
         </div>
+        <button class="hamburger" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
         <div class="nav-links">
-          <a href="#home">Home</a>
-          <a href="#ai-assistant">AI Assistant</a>
-          <a href="#services">Services</a>
-          <a href="#contact">Contact</a>
-          <a href="#signup">SignUp</a>
+          <a href="/">Home</a>
+          <a href="/#ai-assistant">AI Assistant</a>
+          <a href="/#services">Services</a>
+          <a href="/#contact">Contact</a>
+          <a href="/#signup">SignUp</a>
         </div>
       </div>
     </nav>
@@ -50,20 +94,42 @@
 
     <!-- Shared Scripts -->
     <script>
+      // Hamburger menu toggle
+      document
+        .querySelector(".hamburger")
+        .addEventListener("click", function () {
+          document.querySelector(".nav-links").classList.toggle("active");
+          this.classList.toggle("active");
+        });
+
+      // Nav link click handling
       document.querySelectorAll("nav a").forEach((anchor) => {
         anchor.addEventListener("click", function (e) {
-          e.preventDefault();
-          const targetId = this.getAttribute("href").substring(1);
-          const targetElement = document.getElementById(targetId);
-          if (targetElement) {
-            targetElement.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
+          const href = this.getAttribute("href");
+          const url = new URL(href, window.location.origin);
+
+          // If link is on the same page and has a hash, smooth scroll without reload
+          if (url.pathname === window.location.pathname && url.hash) {
+            e.preventDefault();
+
+            const targetId = url.hash.substring(1);
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+              targetElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+              // Close mobile menu if open
+              document.querySelector(".nav-links").classList.remove("active");
+              document.querySelector(".hamburger").classList.remove("active");
+            }
           }
+          // Otherwise, allow default navigation (page reload)
         });
       });
 
+      // Optional: fade out effect on external link navigation
       document.querySelectorAll("a").forEach((link) => {
         const href = link.getAttribute("href");
         if (href && !href.startsWith("#") && !href.startsWith("mailto:")) {
@@ -74,6 +140,21 @@
               window.location.href = href;
             }, 500);
           });
+        }
+      });
+
+      // On page load, smooth scroll to hash target if present
+      window.addEventListener("DOMContentLoaded", () => {
+        if (window.location.hash) {
+          const targetElement = document.querySelector(window.location.hash);
+          if (targetElement) {
+            setTimeout(() => {
+              targetElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }, 100);
+          }
         }
       });
     </script>
