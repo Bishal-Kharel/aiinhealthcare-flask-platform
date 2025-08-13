@@ -1,7 +1,17 @@
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+# Disable Chroma telemetry to avoid errors
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+
 from flask import Blueprint, request, jsonify, stream_with_context, Response
 import redis
 import hashlib
-import os
 import json
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
