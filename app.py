@@ -1,9 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv()  # Load .env variables
+
+
 from flask import Flask, render_template, request, jsonify
 from ai_routes import ai_bp
-import os
-from dotenv import load_dotenv
 
-load_dotenv()  # Load .env variables
 
 app = Flask(__name__)
 app.register_blueprint(ai_bp)
