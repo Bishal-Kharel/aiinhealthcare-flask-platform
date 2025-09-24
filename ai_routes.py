@@ -1,7 +1,4 @@
-# __import__('pysqlite3')
-# import sys
-# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
+# ai_routes.py
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -29,7 +26,6 @@ vectorstore = Chroma(persist_directory="chroma_store", embedding_function=embedd
 
 # Redis connection
 redis_url = os.getenv("REDIS_URL")
-
 if redis_url:
     redis_client = redis.from_url(redis_url, decode_responses=True)
 else:
@@ -88,10 +84,9 @@ def ask():
     cached_response = redis_client.get(cache_key)
     if cached_response:
         def cached_stream():
-            # Send model path first (if any)
             if model_path:
                 yield f"data: {json.dumps({'model_path': model_path})}\n\n"
-            # cached_response is a string, send it as one chunk with body_part
+            # send cached markdown as a single chunk
             yield f"data: {json.dumps({'text': cached_response, 'body_part': body_part})}\n\n"
         return Response(stream_with_context(cached_stream()), mimetype="text/event-stream")
 
@@ -99,47 +94,55 @@ def ask():
     docs = vectorstore.similarity_search(prompt, k=3)
     context = "\n\n---\n\n".join([doc.page_content for doc in docs if doc.page_content.strip()])
 
-    # Construct full prompt for LLM
+    # Construct full prompt for LLM (Markdown output requested)
     if context:
         full_prompt = (
-            f"You are a helpful and empathetic medical assistant. "
-            f"Using the context below, answer the question in a friendly, easy-to-understand, human tone. "
-            f"Be clear, concise, and compassionate.\n\n"
+            "You are a medical assistant. "
+            "Format the entire answer in Markdown with clear headings (#, ##), bold text, and bullet lists. "
+            "Do not wrap Markdown in code fences. Keep it concise and readable.\n\n"
             f"Context:\n{context}\n\n"
             f"User's Question: {prompt}\n\n"
-            f"Your Answer:"
+            "Your Answer:"
         )
     else:
         full_prompt = (
-            f"You are a helpful and empathetic medical assistant. "
-            f"Answer the following question in a friendly, easy-to-understand, human tone. "
-            f"Be clear, concise, and compassionate.\n\n"
+            "You are a medical assistant. "
+            "Format the entire answer in Markdown with clear headings (#, ##), bold text, and bullet lists. "
+            "Do not wrap Markdown in code fences. Keep it concise and readable.\n\n"
             f"User's Question: {prompt}\n\n"
-            f"Your Answer:"
+            "Your Answer:"
         )
 
     # Streamed response for uncached prompts
     def generate():
         full_response = ""
-        # Send model path first (if any)
         if model_path:
             yield f"data: {json.dumps({'model_path': model_path})}\n\n"
-        # Stream OpenAI response chunk by chunk
+
         stream = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a helpful and empathetic medical assistant."},
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful medical assistant. "
+                        "Always output Markdown with headings, bold, and lists. "
+                        "Never use code fences unless explicitly asked. "
+                        "No unsafe medical claims."
+                    ),
+                },
                 {"role": "user", "content": full_prompt}
             ],
             stream=True,
             temperature=0.7
         )
+
         for chunk in stream:
-            if chunk.choices[0].delta.content:
+            if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
                 content = chunk.choices[0].delta.content
                 full_response += content
                 yield f"data: {json.dumps({'text': content, 'body_part': body_part})}\n\n"
-        # Cache full response as string
+
         redis_client.setex(cache_key, 3600, full_response)
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
