@@ -54,7 +54,6 @@ function load3DModel(modelPath, container) {
   }
 
   if (modelPath) {
-    // ✅ Load from path if provided
     const loader = new THREE.GLTFLoader();
     loader.load(
       modelPath,
@@ -71,7 +70,6 @@ function load3DModel(modelPath, container) {
       }
     );
   } else if (window.selectedBodyPartModel) {
-    // ✅ Use previously exported submodel if no modelPath
     const subModel = Array.isArray(window.selectedBodyPartModel)
       ? new THREE.Group().add(
           ...window.selectedBodyPartModel.map((mesh) => mesh.clone())
@@ -79,7 +77,6 @@ function load3DModel(modelPath, container) {
       : window.selectedBodyPartModel.clone();
     finalizeModel(subModel);
   } else {
-    // ❌ Nothing to show
     const errorMsg = document.createElement("div");
     errorMsg.className = "error-message";
     errorMsg.textContent = "No model available to display.";
