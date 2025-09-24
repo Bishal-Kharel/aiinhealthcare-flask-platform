@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Embracing Simplicity in Product Design • Doctors Online{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Explore how calm defaults and clear ownership enhance user experience and streamline workflows.">
+<link rel="canonical" href="/articles/our-product-philosophy-calm-defaults-clear-ownership-fewer-clicks">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Embracing Simplicity in Product Design">
+<meta property="og:description" content="Explore how calm defaults and clear ownership enhance user experience and streamline workflows.">
+<meta property="og:url" content="/articles/our-product-philosophy-calm-defaults-clear-ownership-fewer-clicks">
+<meta name="twitter:card" content="summary_large_image">
+
+
+<!-- Force light color scheme on this page only -->
+<meta name="color-scheme" content="light">
+
+<style>
+.au-page {
+  --au-bg: #f7f8fb;
+  --au-surface: #ffffff;
+  --au-ink: #0f172a;
+  --au-muted: #64748b;
+  --au-border: #e5e7eb;
+  --au-brand: #0ea5e9;
+  --au-brand-2: #38bdf8;
+  --au-shadow: 0 8px 30px rgba(2,6,23,.06);
+  --au-r-lg: 18px;
+  --au-r-md: 12px;
+  --au-prose: 1.04rem;
+  --au-lead: 1.12rem;
+
+  background: linear-gradient(180deg, #ffffff 0%, var(--au-bg) 100%);
+  color: var(--au-ink);
+  padding-top: clamp(72px, 9vw, 96px); /* space for fixed nav from base.html */
+}
+
+.au-wrap { max-width: 1120px; margin: 0 auto; padding: 0 1rem; }
+
+/* Back link directly under header */
+.au-back {
+  padding: .75rem 0 0;
+}
+.au-back a {
+  text-decoration: none; color: var(--au-ink);
+  border: 1px solid var(--au-border);
+  background: var(--au-surface);
+  padding: .45rem .8rem; border-radius: 10px;
+  display: inline-flex; align-items: center; gap:.5rem;
+}
+.au-back a:hover { border-color: #d1d5db; }
+
+.au-crumbs {
+  margin-top: .8rem;
+  font-size: .92rem; color: var(--au-muted); display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+}
+.au-crumbs a { color: inherit; text-decoration: none; }
+.au-crumbs a:hover { text-decoration: underline; }
+
+.au-header { padding: .6rem 0 .5rem; }
+.au-title {
+  font-size: clamp(2rem, 3.6vw, 2.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: .5rem 0 .5rem;
+}
+.au-lead { color: var(--au-muted); font-size: var(--au-lead); max-width: 70ch; }
+.au-meta {
+  margin-top:.6rem; color: var(--au-muted); display:flex; gap:.6rem; flex-wrap:wrap; align-items:center;
+}
+.au-badge {
+  display:inline-flex; align-items:center; gap:.5rem; padding:.25rem .6rem; border:1px solid var(--au-border);
+  border-radius:999px; background: var(--au-surface); font-size:.78rem; color: var(--au-muted);
+}
+.au-cover {
+  margin: 1rem 0; overflow:hidden; border-radius: var(--au-r-lg);
+  border:1px solid var(--au-border); box-shadow: var(--au-shadow);
+}
+.au-cover img { width:100%; height:auto; display:block; }
+
+.au-article-wrap {
+  display: flex; justify-content: center;
+  padding: 1rem 0 3rem;
+}
+.au-article {
+  width: min(100%, 1100px);
+  background: var(--au-surface); border:1px solid var(--au-border);
+  border-radius: var(--au-r-lg);
+  box-shadow: var(--au-shadow);
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.au-prose { font-size: var(--au-prose); line-height: 1.75; word-wrap: break-word; }
+.au-prose p { margin: 1rem 0; }
+.au-prose h2 { font-size: clamp(1.25rem,2.2vw,1.6rem); margin:1.6rem 0 .6rem; }
+.au-prose h3 { font-size: clamp(1.05rem,1.8vw,1.3rem); margin:1.1rem 0 .5rem; }
+.au-prose ul, .au-prose ol { padding-left: 1.2rem; }
+.au-prose img { max-width:100%; height:auto; border-radius: 12px; }
+.au-prose a { color: var(--au-brand); text-decoration: underline; text-underline-offset: 2px; }
+.au-prose blockquote.pull-quote {
+  border-left: 4px solid var(--au-brand);
+  padding-left: .9rem; margin: 1.2rem 0; color: var(--au-muted); font-size: 1.05rem;
+}
+.au-prose .cta {
+  margin: 2rem 0 0; padding: 1rem 1.2rem;
+  background: linear-gradient(0deg, rgba(14,165,233,.06), rgba(14,165,233,.03));
+  border: 1px solid var(--au-border); border-radius: 12px;
+}
+
+.au-progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--au-brand), var(--au-brand-2));
+  z-index: 0; pointer-events: none; transition: width .12s linear;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="au-page">
+  <div class="au-progress" id="au-progress" aria-hidden="true"></div>
+
+  <div class="au-wrap">
+    <!-- Back to Articles directly below the base header -->
+    <p class="au-back"><a href="/healtharticles">← Back to Articles</a></p>
+
+    <!-- Breadcrumbs below the back link -->
+    <Breadcrumbs class="au-crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="/healtharticles">Articles</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Embracing Simplicity in Product Design</span>
+    </Breadcrumbs>
+
+
+    <section class="au-header" aria-label="Article header">
+      <h1 class="au-title">Embracing Simplicity in Product Design</h1>
+      <p class="au-lead">Explore how calm defaults and clear ownership enhance user experience and streamline workflows.</p>
+      <div class="au-meta">
+        <span>Aug 20, 2025</span><span aria-hidden="true">·</span><span>Editors</span><span aria-hidden="true">·</span><span>2 min read</span>
+        <span class="au-badge">Team</span>
+      </div>
+      
+    </section>
+  </div>
+
+  <!-- article card -->
+  <section class="au-article-wrap" aria-label="Article content">
+    <article class="au-article">
+      <div class="au-prose"><article><h2>Finding Clarity Amidst Complexity</h2><p>Picture this: It’s Monday morning, and you’re staring at a screen cluttered with notifications, updates, and options. You feel overwhelmed, ready to give up before the day even starts. Now, imagine a different scenario. A clean interface greets you, guiding you effortlessly through your tasks. That’s the vision behind our product philosophy—calm defaults, clear ownership, and fewer clicks.</p><h2>Why Calm Defaults Matter</h2><p>Calm defaults are like a breath of fresh air in a crowded room. They offer a sense of peace, allowing users to focus on what truly matters. Instead of bombarding users with unnecessary choices, we prioritize simplicity. A thoughtfully designed product lets users dive straight into their work without getting lost in a maze of options. This isn’t about dumbing things down; it’s about enhancing clarity.</p><h3>Ownership at Every Level</h3><p>Clear ownership transforms the way teams interact with their tools. When everyone knows who’s responsible for what, workflow becomes smoother. It eliminates confusion and empowers individuals. No more stepping on toes or passing the buck; instead, there’s a sense of accountability that drives progress. Each member of a team can feel the weight of their contributions, knowing that their role is vital.</p><blockquote class="pull-quote"><p><em>Progress in healthcare AI is a set of careful steps—always with clinicians leading.</em></p></blockquote><ul><li>Streamlined processes</li><li>Enhanced collaboration</li><li>Increased accountability</li></ul><h2>Fewer Clicks, More Focus</h2><p>In our fast-paced world, every click counts. Reducing unnecessary clicks not only saves time but also minimizes distraction. Imagine finishing a task in half the time simply because you didn’t have to navigate through endless menus. This efficiency breeds productivity, allowing users to channel their energy into meaningful work. It’s about cutting through the noise and getting to what’s essential.</p><blockquote>“Simplicity isn’t just a design choice; it’s a way to empower users to do their best work.”</blockquote><p>By embracing this philosophy, we’re not just creating tools; we’re crafting experiences. Experiences that respect users’ time and efforts. Experiences that feel intuitive and natural. In a landscape where complexity often reigns, our approach stands out like a lighthouse guiding ships home.</p><h2>The Road Ahead</h2><p>As we look to the future, our commitment to calm defaults, clear ownership, and fewer clicks remains steadfast. We understand that the digital landscape is ever-evolving, but the need for simplicity and clarity will always persist. Our goal is to ensure that every user feels empowered, not overwhelmed.</p><p>In a world filled with quick-fix solutions that often leave users frustrated, we strive to be the opposite. We’re here to create tools that truly serve their purpose without unnecessary complications. This isn’t just our philosophy; it’s a promise to our users. We’re dedicated to making every interaction seamless, every task manageable, and every experience rewarding.</p><p>Join us on this journey of simplicity and empowerment. Together, let’s reshape how we work and interact with the digital world.</p><div class='cta-box'><h3>Doctors Online Medical Services</h3><p>Discover how our online medical services can simplify your healthcare experience. Get started today!</p></div></article><section class="cta"><strong>Doctors Online Medical Services:</strong> practical, safe ways to trim admin time and give clinicians a little breathing room.</section></div>
+    </article>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  // Progress bar (scoped)
+  const bar = document.getElementById('au-progress');
+  const update = () => {
+    const h = document.documentElement, b = document.body;
+    const scrollTop = h.scrollTop || b.scrollTop;
+    const height = (h.scrollHeight - h.clientHeight);
+    const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+    if (bar) bar.style.width = pct + '%';
+  };
+  document.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
+{% endblock %}

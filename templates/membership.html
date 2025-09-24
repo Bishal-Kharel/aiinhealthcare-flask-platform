@@ -1,0 +1,660 @@
+{% extends "base.html" %} {% block title %}DoctorsOnline Membership{% endblock
+%} {% block extra_head %}
+<!-- Fonts & Stripe (page-only) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<script src="https://js.stripe.com/v3/"></script>
+
+<style>
+  /* ========= Scoped to the membership page only ========= */
+  .oqq-membership {
+    --primary-orange: #0071e3;
+    --secondary-orange: #ff8c42;
+    --light-orange: #ffe8dc;
+    --dark-orange: #e05d2e;
+    --white: #ffffff;
+    --off-white: #f8f9fa;
+    --light-gray: #e9ecef;
+    --medium-gray: #dee2e6;
+    --dark-gray: #495057;
+    --black: #212529;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+
+    font-family: "Inter", sans-serif;
+    color: var(--black);
+    background-color: var(--white);
+  }
+
+  /* Page container (pads for fixed nav) */
+  .oqq-membership .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8rem 5% 4rem; /* top padding leaves space for fixed navbar in base.html */
+  }
+
+  /* Local back button */
+  .oqq-membership .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-orange);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 2rem;
+  }
+  .oqq-membership .back-button svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--primary-orange);
+  }
+
+  /* Header */
+  .oqq-membership .header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .oqq-membership .header h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 2.5rem;
+    color: var(--primary-orange);
+    margin-bottom: 1rem;
+  }
+  .oqq-membership .header p {
+    font-size: 1.1rem;
+    color: var(--dark-gray);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Steps */
+  .oqq-membership .steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .oqq-membership .step {
+    text-align: center;
+    max-width: 300px;
+  }
+  .oqq-membership .step-number {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-orange);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+  }
+  .oqq-membership .step h3 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    color: var(--primary-orange);
+    margin-bottom: 0.5rem;
+  }
+  .oqq-membership .step p {
+    color: var(--dark-gray);
+  }
+
+  /* Benefits */
+  .oqq-membership .benefits {
+    background-color: var(--off-white);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+  }
+  .oqq-membership .benefits h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    text-align: center;
+    color: var(--primary-orange);
+    margin-bottom: 2rem;
+  }
+  .oqq-membership .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  .oqq-membership .benefit-card {
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border-left: 4px solid var(--primary-orange);
+  }
+  .oqq-membership .benefit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+  .oqq-membership .benefit-card h3 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    color: var(--dark-gray);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .oqq-membership .benefit-card h3 svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--primary-orange);
+  }
+  .oqq-membership .benefit-card p {
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+  }
+
+  /* Pricing */
+  .oqq-membership .pricing {
+    margin-bottom: 3rem;
+  }
+  .oqq-membership .pricing h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    text-align: center;
+    color: var(--primary-orange);
+    margin-bottom: 2rem;
+  }
+  .oqq-membership .plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  .oqq-membership .plan {
+    background-color: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--medium-gray);
+    text-align: center;
+    position: relative;
+  }
+  .oqq-membership .plan.popular {
+    border: 2px solid var(--primary-orange);
+  }
+  .oqq-membership .popular-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: var(--primary-orange);
+    color: var(--white);
+    padding: 0.25rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .oqq-membership .plan h3 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+  }
+  .oqq-membership .price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-orange);
+    margin-bottom: 1rem;
+  }
+  .oqq-membership .price span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--dark-gray);
+  }
+  .oqq-membership .tokens {
+    color: var(--dark-orange);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+  .oqq-membership .plan ul {
+    list-style: none;
+    margin-bottom: 2rem;
+  }
+  .oqq-membership .plan li {
+    padding: 0.5rem 0;
+    color: var(--dark-gray);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .oqq-membership .plan li svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--primary-orange);
+  }
+
+  .oqq-membership .btn {
+    display: inline-block;
+    padding: 0.8rem 1.8rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+  }
+  .oqq-membership .btn-primary {
+    background: var(--primary-orange);
+    color: var(--white);
+  }
+  .oqq-membership .btn-primary:hover {
+    background: var(--dark-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  }
+  .oqq-membership .btn-outline {
+    border: 2px solid var(--primary-orange);
+    color: var(--primary-orange);
+    background: transparent;
+  }
+  .oqq-membership .btn-outline:hover {
+    background: var(--light-orange);
+    transform: translateY(-2px);
+  }
+
+  /* Payment form */
+  .oqq-membership .payment-form {
+    background-color: var(--off-white);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+  }
+  .oqq-membership .payment-form h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    text-align: center;
+    color: var(--primary-orange);
+    margin-bottom: 2rem;
+  }
+  .oqq-membership #card-element {
+    background: var(--white);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--medium-gray);
+    margin-bottom: 1.5rem;
+  }
+  .oqq-membership #card-errors {
+    color: #dc3545;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  /* Support */
+  .oqq-membership .support {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .oqq-membership .support h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    color: var(--primary-orange);
+    margin-bottom: 1rem;
+  }
+  .oqq-membership .support p {
+    color: var(--dark-gray);
+    max-width: 700px;
+    margin: 0 auto 1.5rem;
+  }
+  .oqq-membership .contact-link {
+    color: var(--primary-orange);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+  }
+  .oqq-membership .contact-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .oqq-membership .container {
+      padding-top: 6rem;
+    }
+    .oqq-membership .steps {
+      flex-direction: column;
+      align-items: center;
+    }
+    .oqq-membership .plans {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="oqq-membership">
+  <div class="container">
+    <a href="/" class="back-button">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path
+          d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+        />
+      </svg>
+      Back to Home
+    </a>
+
+    <div class="header">
+      <h1>Become a Member</h1>
+      <p>
+        Join OpenQQuantify to access our platform, cutting-edge tools, and
+        monthly tokens for AI-powered design and simulation.
+      </p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Choose Your Plan</h3>
+        <p>Select the membership tier that fits your needs and budget.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Secure Payment</h3>
+        <p>Complete your subscription with our safe payment process.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Get Access</h3>
+        <p>Contact us after payment to activate your membership.</p>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="benefits">
+      <h2>Membership Benefits</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+              />
+            </svg>
+            Platform Access
+          </h3>
+          <p>Full access to our innovative design and simulation platform.</p>
+        </div>
+        <div class="benefit-card">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
+              />
+            </svg>
+            AI Assistant
+          </h3>
+          <p>
+            Our advanced LLM helps with design questions and troubleshooting.
+          </p>
+        </div>
+        <div class="benefit-card">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M3 3v18h18V3H3zm16 16H5V5h14v14z" />
+              <path d="M11 7h2v2h-2zM11 11h2v6h-2z" />
+            </svg>
+            2D Schematic Generation
+          </h3>
+          <p>Automatically generate circuit schematics with AI assistance.</p>
+        </div>
+        <div class="benefit-card">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+              />
+              <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" />
+            </svg>
+            3D Simulation
+          </h3>
+          <p>Test your designs in our advanced 3D game engine environment.</p>
+        </div>
+        <div class="benefit-card">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+              />
+            </svg>
+            Monthly Tokens
+          </h3>
+          <p>Regular allocation of tokens to use our platform features.</p>
+        </div>
+        <div class="benefit-card">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+              />
+            </svg>
+            Community Access
+          </h3>
+          <p>Join our exclusive community of innovators and creators.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Plans -->
+    <div class="pricing">
+      <h2>Choose Your Plan</h2>
+      <div class="plans">
+        <div class="plan">
+          <h3>Starter</h3>
+          <div class="price">$20<span>/month</span></div>
+          <div class="tokens">2,000 tokens monthly</div>
+          <ul>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Platform Access
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >AI Assistant
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Basic 2D Schematics
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >500 3D Sim Credits
+            </li>
+          </ul>
+          <button class="btn btn-outline" data-amount="20">Select Plan</button>
+        </div>
+
+        <div class="plan popular">
+          <div class="popular-badge">Most Popular</div>
+          <h3>Professional</h3>
+          <div class="price">$50<span>/month</span></div>
+          <div class="tokens">7,000 tokens monthly</div>
+          <ul>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Everything in Starter
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Advanced 2D Schematics
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >2,000 3D Sim Credits
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Priority Support
+            </li>
+          </ul>
+          <button class="btn btn-primary" data-amount="50">Select Plan</button>
+        </div>
+
+        <div class="plan">
+          <h3>Enterprise</h3>
+          <div class="price">$100<span>/month</span></div>
+          <div class="tokens">20,000 tokens monthly</div>
+          <ul>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Everything in Professional
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Unlimited 2D Schematics
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >5,000 3D Sim Credits
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                /></svg
+              >Dedicated Account Manager
+            </li>
+          </ul>
+          <button class="btn btn-outline" data-amount="100">Select Plan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment form (Stripe Element placeholder) -->
+    <div class="payment-form">
+      <h2>Secure Payment</h2>
+      <div id="card-element"></div>
+      <div id="card-errors" role="alert"></div>
+    </div>
+
+    <!-- Support -->
+    <div class="support">
+      <h2>Need Help?</h2>
+      <p>
+        Join us for our stakeholders meeting to collaborate and develop the
+        technology the community needs.
+      </p>
+      <p>
+        Contact us at
+        <a href="mailto:connect@openqquantify.com" class="contact-link"
+          >connect@openqquantify.com</a
+        >
+        after payment to activate your membership.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_scripts %}
+<script>
+  // Initialize Stripe (you can inject a safer key via Jinja later if you prefer)
+  const stripe = Stripe(
+    "pk_live_51PLv10FZ4exTU5ChAw7rBEOsNXrmp0Sv8FMcTaOcttnjhtCUaLtUvExwAoLgURNpgnpfqjHXmVt6QANDzuVNWZo900inrB8keT"
+  );
+  const elements = stripe.elements();
+  const card = elements.create("card");
+  card.mount("#card-element");
+
+  card.on("change", function (event) {
+    const displayError = document.getElementById("card-errors");
+    displayError.textContent = event.error ? event.error.message : "";
+  });
+
+  // Plan buttons → create Checkout Session → redirect
+  document
+    .querySelectorAll(".oqq-membership .btn[data-amount]")
+    .forEach((button) => {
+      button.addEventListener("click", function () {
+        const amount = this.getAttribute("data-amount");
+
+        // Disable buttons while processing
+        document
+          .querySelectorAll(".oqq-membership .btn[data-amount]")
+          .forEach((btn) => {
+            btn.disabled = true;
+            btn.textContent = "Processing...";
+          });
+
+        fetch("/create-membership-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: amount }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              document.getElementById("card-errors").textContent = data.error;
+              // Re-enable buttons
+              document
+                .querySelectorAll(".oqq-membership .btn[data-amount]")
+                .forEach((btn) => {
+                  btn.disabled = false;
+                  btn.textContent = "Select Plan";
+                });
+            } else {
+              stripe.redirectToCheckout({ sessionId: data.id });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("card-errors").textContent =
+              "An error occurred. Please try again.";
+            document
+              .querySelectorAll(".oqq-membership .btn[data-amount]")
+              .forEach((btn) => {
+                btn.disabled = false;
+                btn.textContent = "Select Plan";
+              });
+          });
+      });
+    });
+</script>
+{% endblock %}

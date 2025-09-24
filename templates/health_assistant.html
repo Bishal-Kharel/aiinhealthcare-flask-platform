@@ -10,27 +10,13 @@
     />
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/chatMessages.css') }}"
+      href="{{ url_for('static', filename='css/health_assistant.css') }}"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/chatInput.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/threeDModelFull.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/introVideo.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/index.css') }}"
-    />
+
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.min.js"></script>
 
     <link
       rel="icon"
@@ -45,6 +31,7 @@
         <img src="static/images/logo.png" alt="Virtual Health Assistant Logo" />
       </div>
     </header>
+
     <div id="intro-video-container">
       <video id="intro-video" autoplay muted playsinline>
         <source
@@ -54,6 +41,7 @@
         Your browser does not support the video tag.
       </video>
     </div>
+
     <main>
       <div id="initial-prompt-container">
         <div id="initial-chat-input-wrapper">
@@ -64,7 +52,7 @@
               placeholder="Ask about a body part..."
               autocomplete="off"
             />
-            <button id="initial-send-btn">
+            <button id="initial-send-btn" aria-label="Send">
               <svg
                 width="24"
                 height="24"
@@ -84,6 +72,7 @@
           </button>
         </div>
       </div>
+
       <div id="chat-interface" style="display: none">
         <div id="model-container"></div>
         <div id="chat-board">
@@ -100,7 +89,7 @@
                     placeholder="Ask about a body part..."
                     autocomplete="off"
                   />
-                  <button id="send-btn">
+                  <button id="send-btn" aria-label="Send">
                     <svg
                       width="24"
                       height="24"
@@ -121,9 +110,10 @@
               </div>
             </div>
           </section>
+
           <section id="expanded-chat" style="display: none">
             <div id="expanded-answer-container">
-              <button id="collapse-btn">
+              <button id="collapse-btn" aria-label="Back">
                 <svg
                   width="24"
                   height="24"
@@ -148,7 +138,7 @@
                     placeholder="Ask about a body part..."
                     autocomplete="off"
                   />
-                  <button id="expanded-send-btn">
+                  <button id="expanded-send-btn" aria-label="Send">
                     <svg
                       width="24"
                       height="24"
@@ -172,14 +162,24 @@
         </div>
       </div>
     </main>
-    <script src="{{ url_for('static', filename='js/chatMessages.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/chatInput.js') }}"></script>
+
+    <!-- Markdown parser and sanitizer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/chatbox.js') }}"></script>
+    <script>
+      const token = localStorage.getItem("access_token");
+      if (!token) window.location.href = "/login";
+      window.addEventListener("load", () => {
+        document.body.style.opacity = "1";
+      });
+    </script>
     <script
       type="module"
       src="{{ url_for('static', filename='js/threeDModelFull.js') }}"
     ></script>
     <script src="{{ url_for('static', filename='js/dynamic3dModel.js') }}"></script>
-
     <script>
       window.addEventListener("load", () => {
         document.body.style.opacity = "1";

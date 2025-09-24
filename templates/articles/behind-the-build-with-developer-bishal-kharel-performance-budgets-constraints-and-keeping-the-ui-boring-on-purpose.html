@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Behind the Build: Developer Bishal Kharel on Performance and Purpose • Doctors Online{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Discover developer Bishal Kharel&#x27;s approach to performance budgets and minimalist UI design.">
+<link rel="canonical" href="/articles/behind-the-build-with-developer-bishal-kharel-performance-budgets-constraints-and-keeping-the-ui-boring-on-purpose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Behind the Build: Developer Bishal Kharel on Performance and Purpose">
+<meta property="og:description" content="Discover developer Bishal Kharel&#x27;s approach to performance budgets and minimalist UI design.">
+<meta property="og:url" content="/articles/behind-the-build-with-developer-bishal-kharel-performance-budgets-constraints-and-keeping-the-ui-boring-on-purpose">
+<meta name="twitter:card" content="summary_large_image">
+
+
+<!-- Force light color scheme on this page only -->
+<meta name="color-scheme" content="light">
+
+<style>
+.au-page {
+  --au-bg: #f7f8fb;
+  --au-surface: #ffffff;
+  --au-ink: #0f172a;
+  --au-muted: #64748b;
+  --au-border: #e5e7eb;
+  --au-brand: #0ea5e9;
+  --au-brand-2: #38bdf8;
+  --au-shadow: 0 8px 30px rgba(2,6,23,.06);
+  --au-r-lg: 18px;
+  --au-r-md: 12px;
+  --au-prose: 1.04rem;
+  --au-lead: 1.12rem;
+
+  background: linear-gradient(180deg, #ffffff 0%, var(--au-bg) 100%);
+  color: var(--au-ink);
+  padding-top: clamp(72px, 9vw, 96px); /* space for fixed nav from base.html */
+}
+
+.au-wrap { max-width: 1120px; margin: 0 auto; padding: 0 1rem; }
+
+/* Back link directly under header */
+.au-back {
+  padding: .75rem 0 0;
+}
+.au-back a {
+  text-decoration: none; color: var(--au-ink);
+  border: 1px solid var(--au-border);
+  background: var(--au-surface);
+  padding: .45rem .8rem; border-radius: 10px;
+  display: inline-flex; align-items: center; gap:.5rem;
+}
+.au-back a:hover { border-color: #d1d5db; }
+
+.au-crumbs {
+  margin-top: .8rem;
+  font-size: .92rem; color: var(--au-muted); display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+}
+.au-crumbs a { color: inherit; text-decoration: none; }
+.au-crumbs a:hover { text-decoration: underline; }
+
+.au-header { padding: .6rem 0 .5rem; }
+.au-title {
+  font-size: clamp(2rem, 3.6vw, 2.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: .5rem 0 .5rem;
+}
+.au-lead { color: var(--au-muted); font-size: var(--au-lead); max-width: 70ch; }
+.au-meta {
+  margin-top:.6rem; color: var(--au-muted); display:flex; gap:.6rem; flex-wrap:wrap; align-items:center;
+}
+.au-badge {
+  display:inline-flex; align-items:center; gap:.5rem; padding:.25rem .6rem; border:1px solid var(--au-border);
+  border-radius:999px; background: var(--au-surface); font-size:.78rem; color: var(--au-muted);
+}
+.au-cover {
+  margin: 1rem 0; overflow:hidden; border-radius: var(--au-r-lg);
+  border:1px solid var(--au-border); box-shadow: var(--au-shadow);
+}
+.au-cover img { width:100%; height:auto; display:block; }
+
+.au-article-wrap {
+  display: flex; justify-content: center;
+  padding: 1rem 0 3rem;
+}
+.au-article {
+  width: min(100%, 1100px);
+  background: var(--au-surface); border:1px solid var(--au-border);
+  border-radius: var(--au-r-lg);
+  box-shadow: var(--au-shadow);
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.au-prose { font-size: var(--au-prose); line-height: 1.75; word-wrap: break-word; }
+.au-prose p { margin: 1rem 0; }
+.au-prose h2 { font-size: clamp(1.25rem,2.2vw,1.6rem); margin:1.6rem 0 .6rem; }
+.au-prose h3 { font-size: clamp(1.05rem,1.8vw,1.3rem); margin:1.1rem 0 .5rem; }
+.au-prose ul, .au-prose ol { padding-left: 1.2rem; }
+.au-prose img { max-width:100%; height:auto; border-radius: 12px; }
+.au-prose a { color: var(--au-brand); text-decoration: underline; text-underline-offset: 2px; }
+.au-prose blockquote.pull-quote {
+  border-left: 4px solid var(--au-brand);
+  padding-left: .9rem; margin: 1.2rem 0; color: var(--au-muted); font-size: 1.05rem;
+}
+.au-prose .cta {
+  margin: 2rem 0 0; padding: 1rem 1.2rem;
+  background: linear-gradient(0deg, rgba(14,165,233,.06), rgba(14,165,233,.03));
+  border: 1px solid var(--au-border); border-radius: 12px;
+}
+
+.au-progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--au-brand), var(--au-brand-2));
+  z-index: 0; pointer-events: none; transition: width .12s linear;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="au-page">
+  <div class="au-progress" id="au-progress" aria-hidden="true"></div>
+
+  <div class="au-wrap">
+    <!-- Back to Articles directly below the base header -->
+    <p class="au-back"><a href="/healtharticles">← Back to Articles</a></p>
+
+    <!-- Breadcrumbs below the back link -->
+    <Breadcrumbs class="au-crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="/healtharticles">Articles</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Behind the Build: Developer Bishal Kharel on Performance and Purpose</span>
+    </Breadcrumbs>
+
+
+    <section class="au-header" aria-label="Article header">
+      <h1 class="au-title">Behind the Build: Developer Bishal Kharel on Performance and Purpose</h1>
+      <p class="au-lead">Discover developer Bishal Kharel&#x27;s approach to performance budgets and minimalist UI design.</p>
+      <div class="au-meta">
+        <span>Aug 20, 2025</span><span aria-hidden="true">·</span><span>Editors</span><span aria-hidden="true">·</span><span>3 min read</span>
+        <span class="au-badge">Team</span>
+      </div>
+      
+    </section>
+  </div>
+
+  <!-- article card -->
+  <section class="au-article-wrap" aria-label="Article content">
+    <article class="au-article">
+      <div class="au-prose"><article><h2>Crafting Simplicity in a Complex World</h2><p>In a sunlit office, the hum of keyboards fills the air as Bishal Kharel pores over lines of code. His latest project—a web application meant to streamline workflows—sits on his screen, a canvas of potential. Yet, it’s the constraints he imposes that excite him the most. Performance budgets, he insists, are not just numbers; they’re guiding principles that keep projects grounded.</p><h3>The Art of Boring UI</h3><p>Kharel believes in keeping the user interface (UI) intentionally simple. “Boring is the new black,” he quips, a playful nod to the idea that flashy designs can often distract from functionality. He recalls a project where a vibrant, animated interface dazzled users but ultimately frustrated them with slow loading times. The lesson? Sometimes, less truly is more. By stripping away unnecessary elements, Kharel creates a seamless experience that allows users to focus on what really matters—getting their work done efficiently.</p><h3>Performance Budgets and Workflow Clarity</h3><p>Setting performance budgets is a core aspect of Kharel’s philosophy. He approaches each project with a clear set of metrics: load time, responsiveness, and overall user satisfaction. This isn’t just about making things faster; it’s about creating a reliable environment where users can thrive. “When you define what’s acceptable early on, you build with intention,” he explains. By doing so, he saves time and reduces friction throughout the development process.</p><blockquote class="pull-quote"><p><em>Progress in healthcare AI is a set of careful steps—always with clinicians leading.</em></p></blockquote><p>Kharel often employs tools like Nanize to enhance workflow clarity. This platform helps him maintain governance over projects, ensuring that everyone on the team understands the goals and constraints. “It’s not about using every feature; it’s about knowing what you need,” he says, emphasizing the importance of focusing on essentials.</p><ul><li>Performance budgets guide development.</li><li>Boring UI fosters user focus.</li><li>Tools enhance workflow clarity.</li></ul><blockquote>“Boring is the new black.”</blockquote><p>For Kharel, embracing constraints doesn’t feel limiting; it’s liberating. It allows him to innovate within boundaries, pushing the envelope while keeping the user experience front and center. He knows that when developers chase after the latest trends, they risk losing sight of what’s genuinely valuable for users.</p><h2>Balancing Innovation and User Needs</h2><p>Walking this tightrope requires constant vigilance. Kharel recalls a time when a client insisted on adding complex features for the sake of novelty. He fought back, advocating for simplicity and clarity. “Users don’t want to navigate a maze; they want a straight path to their goals,” he asserts. In the end, the client agreed, and the streamlined product exceeded expectations.</p><p>As technology evolves, the battle between innovation and user-centric design continues. Kharel remains optimistic. He believes that by prioritizing performance budgets and maintaining clear workflows, developers can create products that not only look good but also serve their purpose effectively.</p><p>Kharel’s approach serves as a reminder that in a world obsessed with the new, sometimes it’s the simplest solutions that resonate the most. His commitment to a ‘boring’ UI is a bold statement in the tech landscape, one that champions functionality over flash. And as he wraps up another day at the office, he knows he’s on the right track—one deliberate line of code at a time.</p><div class='cta-box'><h3>Doctors Online Medical Services</h3><p>For accessible healthcare solutions, consider our online medical services. Get the support you need from the comfort of your home.</p></div></article><section class="cta"><strong>Doctors Online Medical Services:</strong> practical, safe ways to trim admin time and give clinicians a little breathing room.</section></div>
+    </article>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  // Progress bar (scoped)
+  const bar = document.getElementById('au-progress');
+  const update = () => {
+    const h = document.documentElement, b = document.body;
+    const scrollTop = h.scrollTop || b.scrollTop;
+    const height = (h.scrollHeight - h.clientHeight);
+    const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+    if (bar) bar.style.width = pct + '%';
+  };
+  document.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
+{% endblock %}

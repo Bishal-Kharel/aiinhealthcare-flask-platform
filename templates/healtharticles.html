@@ -1,0 +1,443 @@
+{% extends "base.html" %} {% block title %}Articles • Doctors Online{% endblock
+%} {% block extra_head %}
+<style>
+  /* ----- Light-only Apple-style tokens ----- */
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --ink: #1d1d1f;
+    --muted: #6e6e73;
+    --accent: #0071e3;
+    --accent-press: #005bb5;
+    --border: #e5e5ea;
+    --shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    --radius: 20px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  /* Hero */
+  .heros {
+    padding: 5rem 1rem 2rem;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1200px 600px at 50% -30%,
+        rgba(0, 0, 0, 0.03),
+        rgba(0, 0, 0, 0)
+      );
+  }
+  .heros .inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .heros h1 {
+    font-size: 2.4rem;
+    letter-spacing: 0.2px;
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+  .heros p {
+    color: var(--muted);
+    margin: 0;
+  }
+  .hr {
+    max-width: 1120px;
+    margin: 1.2rem auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* Controls */
+  .controls {
+    max-width: 1120px;
+    margin: 1rem auto 0;
+    padding: 0 1rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .left,
+  .right {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* Segmented control */
+  .segment {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.25rem;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    gap: 0.25rem;
+  }
+  a {
+    color: #000000;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .segment button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .segment button.active {
+    color: #fff;
+    background: var(--accent);
+  }
+  .segment button:focus-visible {
+    outline: 2px solid rgba(0, 113, 227, 0.4);
+    outline-offset: 2px;
+  }
+
+  /* Search */
+  .search {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .search input {
+    width: min(520px, 70vw);
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+  .search input::placeholder {
+    color: var(--muted);
+  }
+  .search button {
+    padding: 0.8rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .search button:hover {
+    background: var(--accent-press);
+  }
+
+  /* Grid */
+  .grid {
+    max-width: 1120px;
+    margin: 1.3rem auto 3.2rem;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.1rem 1rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease,
+      border-color 0.18s ease;
+    position: relative;
+    min-height: 160px;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1);
+  }
+  .card h3 {
+    margin: 0.2rem 0 0.45rem;
+    font-size: 1.12rem;
+    letter-spacing: 0.1px;
+  }
+  .card p {
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.86rem;
+    margin: 0.1rem 0 0.45rem;
+  }
+  .read {
+    display: inline-block;
+    margin-top: 0.6rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .read:hover {
+    text-decoration: underline;
+  }
+
+  /* NEW badge */
+  .badge {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    background: #0071e3;
+    color: #ffffff;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    border: 1px #005bb5;
+  }
+
+  /* Skeleton */
+  .skel {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0.06),
+      rgba(0, 0, 0, 0)
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    height: 1rem;
+    border-radius: 8px;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Pager */
+  .pager {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+  }
+  .pager button {
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    color: var(--ink);
+  }
+  .pager button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Focus */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid rgba(0, 113, 227, 0.4);
+    outline-offset: 2px;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .hero h1 {
+      font-size: 2rem;
+    }
+    .controls {
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="heros">
+  <div class="inner">
+    <h1>Articles</h1>
+    <p>Fresh, practical writing for clinicians and health teams.</p>
+  </div>
+  <div class="hr"></div>
+</section>
+
+<section class="controls">
+  <div class="left">
+    <div class="segment" id="chips">
+      <button class="active" data-filter="all" type="button">All</button>
+      <button data-filter="nanize" type="button">Nanize</button>
+      <button data-filter="team" type="button">Team</button>
+    </div>
+  </div>
+  <div class="right">
+    <div class="search">
+      <input
+        id="q"
+        type="search"
+        placeholder="Search articles…"
+        aria-label="Search articles"
+      />
+      <button id="go" type="button">Search</button>
+    </div>
+  </div>
+</section>
+
+<section class="grid" id="grid">
+  <!-- Skeletons while loading -->
+  <div class="card">
+    <div class="skel" style="width: 60%"></div>
+    <div class="skel" style="width: 40%; margin-top: 8px"></div>
+    <div class="skel" style="height: 60px; margin-top: 12px"></div>
+  </div>
+  <div class="card">
+    <div class="skel" style="width: 70%"></div>
+    <div class="skel" style="width: 35%; margin-top: 8px"></div>
+    <div class="skel" style="height: 60px; margin-top: 12px"></div>
+  </div>
+  <div class="card">
+    <div class="skel" style="width: 50%"></div>
+    <div class="skel" style="width: 30%; margin-top: 8px"></div>
+    <div class="skel" style="height: 60px; margin-top: 12px"></div>
+  </div>
+</section>
+
+<div class="pager"><button id="more" type="button">Load more</button></div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  (function () {
+    const STATIC_MODE = false; // links to /static/blog/<slug>.html
+    const PAGE_SIZE = 12;
+    const NEW_DAYS = 7;
+
+    const state = { all: [], filter: "all", query: "", page: 1 };
+
+    const grid = document.getElementById("grid");
+    const chips = document.getElementById("chips");
+    const q = document.getElementById("q");
+    const go = document.getElementById("go");
+    const more = document.getElementById("more");
+
+    const targetUrl = (slug) =>
+      STATIC_MODE ? `/templates/articles/${slug}.html` : `/articles/${slug}`;
+    const fmtDate = (iso) => {
+      try {
+        return new Date(iso).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      } catch (e) {
+        return "";
+      }
+    };
+    const isNew = (iso) => {
+      try {
+        return (Date.now() - new Date(iso).getTime()) / 86400000 <= NEW_DAYS;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    function filtered() {
+      const needle = (state.query || "").toLowerCase().trim();
+      return state.all.filter((a) => {
+        const okFilter =
+          state.filter === "all"
+            ? true
+            : (a.category || "").toLowerCase() === state.filter;
+        const okSearch =
+          !needle ||
+          (a.title || "").toLowerCase().includes(needle) ||
+          (a.excerpt || "").toLowerCase().includes(needle);
+        return okFilter && okSearch;
+      });
+    }
+
+    function render() {
+      const items = filtered();
+      const slice = items.slice(0, state.page * PAGE_SIZE);
+
+      if (!slice.length) {
+        grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--muted)">No articles found.</p>`;
+        more.disabled = true;
+        return;
+      }
+
+      grid.innerHTML = slice
+        .map(
+          (a) => `
+      <article class="card">
+        ${isNew(a.published_at) ? `<span class="badge">NEW</span>` : ``}
+        <div class="meta">${a.published_at ? fmtDate(a.published_at) : ""} · ${
+            a.author || "Editors"
+          }</div>
+        <h3><a href="${targetUrl(a.slug)}">${a.title}</a></h3>
+        ${a.excerpt ? `<p>${a.excerpt}</p>` : ``}
+        <a class="read" href="${targetUrl(a.slug)}">Read more →</a>
+      </article>
+    `
+        )
+        .join("");
+
+      more.disabled = slice.length >= items.length;
+    }
+
+    async function fetchAll() {
+      try {
+        const res = await fetch("/api/articles?limit=1000", {
+          cache: "no-store",
+        });
+        state.all = await res.json();
+      } catch (e) {
+        console.error(e);
+        state.all = [];
+      }
+      render();
+    }
+
+    chips.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      chips
+        .querySelectorAll("button")
+        .forEach((x) => x.classList.remove("active"));
+      b.classList.add("active");
+      state.filter = b.dataset.filter;
+      state.page = 1;
+      render();
+    });
+
+    go.addEventListener("click", () => {
+      state.query = q.value || "";
+      state.page = 1;
+      render();
+    });
+    let t = null;
+    q.addEventListener("input", () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        state.query = q.value || "";
+        state.page = 1;
+        render();
+      }, 220);
+    });
+
+    more.addEventListener("click", () => {
+      state.page += 1;
+      render();
+    });
+
+    fetchAll();
+  })();
+</script>
+{% endblock %}

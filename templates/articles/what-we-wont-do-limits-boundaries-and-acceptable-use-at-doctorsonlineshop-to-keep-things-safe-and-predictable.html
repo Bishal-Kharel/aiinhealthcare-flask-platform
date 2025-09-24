@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Setting Boundaries: What We Won&#x27;t Do at Doctors Online • Doctors Online{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Learn about the limits and boundaries at Doctors Online for safe and predictable services.">
+<link rel="canonical" href="/articles/what-we-wont-do-limits-boundaries-and-acceptable-use-at-doctorsonlineshop-to-keep-things-safe-and-predictable">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Setting Boundaries: What We Won&#x27;t Do at Doctors Online">
+<meta property="og:description" content="Learn about the limits and boundaries at Doctors Online for safe and predictable services.">
+<meta property="og:url" content="/articles/what-we-wont-do-limits-boundaries-and-acceptable-use-at-doctorsonlineshop-to-keep-things-safe-and-predictable">
+<meta name="twitter:card" content="summary_large_image">
+
+
+<!-- Force light color scheme on this page only -->
+<meta name="color-scheme" content="light">
+
+<style>
+.au-page {
+  --au-bg: #f7f8fb;
+  --au-surface: #ffffff;
+  --au-ink: #0f172a;
+  --au-muted: #64748b;
+  --au-border: #e5e7eb;
+  --au-brand: #0ea5e9;
+  --au-brand-2: #38bdf8;
+  --au-shadow: 0 8px 30px rgba(2,6,23,.06);
+  --au-r-lg: 18px;
+  --au-r-md: 12px;
+  --au-prose: 1.04rem;
+  --au-lead: 1.12rem;
+
+  background: linear-gradient(180deg, #ffffff 0%, var(--au-bg) 100%);
+  color: var(--au-ink);
+  padding-top: clamp(72px, 9vw, 96px); /* space for fixed nav from base.html */
+}
+
+.au-wrap { max-width: 1120px; margin: 0 auto; padding: 0 1rem; }
+
+/* Back link directly under header */
+.au-back {
+  padding: .75rem 0 0;
+}
+.au-back a {
+  text-decoration: none; color: var(--au-ink);
+  border: 1px solid var(--au-border);
+  background: var(--au-surface);
+  padding: .45rem .8rem; border-radius: 10px;
+  display: inline-flex; align-items: center; gap:.5rem;
+}
+.au-back a:hover { border-color: #d1d5db; }
+
+.au-crumbs {
+  margin-top: .8rem;
+  font-size: .92rem; color: var(--au-muted); display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+}
+.au-crumbs a { color: inherit; text-decoration: none; }
+.au-crumbs a:hover { text-decoration: underline; }
+
+.au-header { padding: .6rem 0 .5rem; }
+.au-title {
+  font-size: clamp(2rem, 3.6vw, 2.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: .5rem 0 .5rem;
+}
+.au-lead { color: var(--au-muted); font-size: var(--au-lead); max-width: 70ch; }
+.au-meta {
+  margin-top:.6rem; color: var(--au-muted); display:flex; gap:.6rem; flex-wrap:wrap; align-items:center;
+}
+.au-badge {
+  display:inline-flex; align-items:center; gap:.5rem; padding:.25rem .6rem; border:1px solid var(--au-border);
+  border-radius:999px; background: var(--au-surface); font-size:.78rem; color: var(--au-muted);
+}
+.au-cover {
+  margin: 1rem 0; overflow:hidden; border-radius: var(--au-r-lg);
+  border:1px solid var(--au-border); box-shadow: var(--au-shadow);
+}
+.au-cover img { width:100%; height:auto; display:block; }
+
+.au-article-wrap {
+  display: flex; justify-content: center;
+  padding: 1rem 0 3rem;
+}
+.au-article {
+  width: min(100%, 1100px);
+  background: var(--au-surface); border:1px solid var(--au-border);
+  border-radius: var(--au-r-lg);
+  box-shadow: var(--au-shadow);
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.au-prose { font-size: var(--au-prose); line-height: 1.75; word-wrap: break-word; }
+.au-prose p { margin: 1rem 0; }
+.au-prose h2 { font-size: clamp(1.25rem,2.2vw,1.6rem); margin:1.6rem 0 .6rem; }
+.au-prose h3 { font-size: clamp(1.05rem,1.8vw,1.3rem); margin:1.1rem 0 .5rem; }
+.au-prose ul, .au-prose ol { padding-left: 1.2rem; }
+.au-prose img { max-width:100%; height:auto; border-radius: 12px; }
+.au-prose a { color: var(--au-brand); text-decoration: underline; text-underline-offset: 2px; }
+.au-prose blockquote.pull-quote {
+  border-left: 4px solid var(--au-brand);
+  padding-left: .9rem; margin: 1.2rem 0; color: var(--au-muted); font-size: 1.05rem;
+}
+.au-prose .cta {
+  margin: 2rem 0 0; padding: 1rem 1.2rem;
+  background: linear-gradient(0deg, rgba(14,165,233,.06), rgba(14,165,233,.03));
+  border: 1px solid var(--au-border); border-radius: 12px;
+}
+
+.au-progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--au-brand), var(--au-brand-2));
+  z-index: 0; pointer-events: none; transition: width .12s linear;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="au-page">
+  <div class="au-progress" id="au-progress" aria-hidden="true"></div>
+
+  <div class="au-wrap">
+    <!-- Back to Articles directly below the base header -->
+    <p class="au-back"><a href="/healtharticles">← Back to Articles</a></p>
+
+    <!-- Breadcrumbs below the back link -->
+    <Breadcrumbs class="au-crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="/healtharticles">Articles</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Setting Boundaries: What We Won't Do at Doctors Online</span>
+    </Breadcrumbs>
+
+
+    <section class="au-header" aria-label="Article header">
+      <h1 class="au-title">Setting Boundaries: What We Won't Do at Doctors Online</h1>
+      <p class="au-lead">Learn about the limits and boundaries at Doctors Online for safe and predictable services.</p>
+      <div class="au-meta">
+        <span>Aug 20, 2025</span><span aria-hidden="true">·</span><span>Editors</span><span aria-hidden="true">·</span><span>2 min read</span>
+        <span class="au-badge">Team</span>
+      </div>
+      
+    </section>
+  </div>
+
+  <!-- article card -->
+  <section class="au-article-wrap" aria-label="Article content">
+    <article class="au-article">
+      <div class="au-prose"><article><h2>Understanding Our Limits</h2><p>Imagine you're sitting at a café, scrolling through your phone. You see an ad promising to solve all your health issues in a click. It sounds tempting, right? But behind that glossy promise lies a truth we hold dear at Doctors Online: some solutions aren’t built for the long haul. We’re here to provide a service rooted in safety and clarity, not quick fixes that slip through your fingers like sand.</p><h3>Safe and Predictable Services</h3><p>At Doctors Online, we set clear boundaries to maintain the quality and reliability you expect from us. Our approach emphasizes transparency and realistic expectations. Here are a few key areas where we draw the line:</p><ul><li>No medical diagnoses or treatment plans.</li><li>No promises of miraculous results.</li><li>No shortcuts that compromise safety.</li></ul><p>We believe in clear communication and ethical practices. This means you won’t find any gimmicks or dubious claims in our services. Instead, we focus on providing tools that enhance your experience. For instance, with our workflow clarity feature, you can easily navigate through your options and understand what to expect without confusion.</p><blockquote class="pull-quote"><p><em>Progress in healthcare AI is a set of careful steps—always with clinicians leading.</em></p></blockquote><h3>Why Boundaries Matter</h3><p>Setting these boundaries isn’t just a rulebook; it’s our commitment to you. In a landscape filled with quick-fix tools that often disappoint, we stand firm. We don’t want to be that slippery slope that leads you away from genuine care and attention. Our goal is to empower you with the information and resources that matter, while keeping things safe and predictable.</p><p>In this digital age, it’s easy to get lost in the noise. We aim to cut through that. Whether you’re looking for guidance or just a reliable chat, we keep our services straightforward. We value your trust and aim to maintain it by sticking to what we do best.</p><blockquote>“Our commitment to clarity and safety sets us apart in the crowded landscape of online services.”</blockquote><p>So, while others may promise the moon, we promise integrity. We won’t claim to do it all, and that’s a promise you can count on.</p><h2>Getting Started with Doctors Online</h2><p>When you choose to engage with us, you’re choosing a path marked by reliability. Our services are designed to support you without overstepping into areas we can’t ethically manage. Whether you need a consultation or just some guidance, we’re here to help.</p><p>So, if you’re ready to explore a safer, clearer avenue for your health inquiries, we invite you to reach out. Together, we can navigate the complexities of health with integrity and respect.</p><div class='cta-box'>Interested in learning more? Explore our services at Doctors Online Medical Services and take the first step towards clarity today!</div></article><section class="cta"><strong>Doctors Online Medical Services:</strong> practical, safe ways to trim admin time and give clinicians a little breathing room.</section></div>
+    </article>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  // Progress bar (scoped)
+  const bar = document.getElementById('au-progress');
+  const update = () => {
+    const h = document.documentElement, b = document.body;
+    const scrollTop = h.scrollTop || b.scrollTop;
+    const height = (h.scrollHeight - h.clientHeight);
+    const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+    if (bar) bar.style.width = pct + '%';
+  };
+  document.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
+{% endblock %}
