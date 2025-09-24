@@ -1,6 +1,3 @@
-/* ------------------------------
-   Global Reset & Base Styles
------------------------------- */
 * {
   margin: 0;
   padding: 0;
@@ -14,9 +11,6 @@ body {
   color: #1d1d1f;
 }
 
-/* ------------------------------
-   Intro Video
------------------------------- */
 #intro-video-container {
   position: fixed;
   top: 0;
@@ -121,7 +115,6 @@ body {
   align-items: center;
 }
 
-/* Buttons */
 #render-3d-btn,
 #expanded-render-3d-btn,
 #initial-render-3d-btn {
@@ -150,7 +143,6 @@ body {
   color: #1c1c1e;
 }
 
-/* Inputs */
 #chat-input,
 #expanded-chat-input,
 #initial-chat-input {
@@ -169,7 +161,6 @@ body {
   color: #777777;
 }
 
-/* Send Buttons */
 #send-btn,
 #expanded-send-btn,
 #initial-send-btn {
@@ -327,14 +318,12 @@ body {
   align-self: flex-start;
 }
 
-/* Error */
 .error-message {
   color: #e74c3c;
   margin: 0.5rem 0;
   align-self: center;
 }
 
-/* 3D Viewer */
 .three-viewer {
   width: 100%;
   max-width: 40vw;
